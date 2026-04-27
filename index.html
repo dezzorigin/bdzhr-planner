@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Bdzhr Planner</title>
+    
+    <link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#6366f1">
+<link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3135/3135715.png">
+
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js').then(reg => {
+        console.log('Service Worker terdaftar Bos!', reg.scope);
+      }).catch(err => {
+        console.log('Service Worker gagal:', err);
+      });
+    });
+  }
+</script>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: { extend: { colors: { brand: '#6366f1' } } }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+        body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+        .glass { background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.2); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
+        .dark .glass { background: rgba(30, 41, 59, 0.6); border: 1px solid rgba(255, 255, 255, 0.05); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
+        ::-webkit-scrollbar { width: 0px; background: transparent; }
+        input[type="date"]::-webkit-calendar-picker-indicator { cursor: pointer; opacity: 0.6; transition: 0.2s; }
+        input[type="date"]::-webkit-calendar-picker-indicator:hover { opacity: 1; }
+        .dark input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); }
+        
+
+
+        /* Nav active state */
+        .nav-item.active { color: #6366f1; }
+        .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
+    </style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 transition-colors duration-300 relative min-h-screen flex flex-col">
+
+    <header class="sticky top-0 z-40 glass border-b border-slate-200 dark:border-slate-800 px-5 py-4 flex justify-between items-center">
+        <h1 class="text-xl font-extrabold tracking-tight">Bdzhr<span class="text-brand">Planner</span></h1>
+        <button onclick="toggleSettings()" class="p-2.5 rounded-lg bg-slate-200 dark:bg-slate-800 text-sm hover:bg-slate-300 dark:hover:bg-slate-700 transition flex items-center gap-2 font-semibold">
+            <span>⚙️</span> <span class="hidden sm:inline">Pengaturan</span>
+        </button>
+    </header>
+
+    <main class="p-5 max-w-md mx-auto w-full flex-grow pb-28" id="appContent">
+        
+        <!-- SETUP VIEW -->
+        <div id="setupView" class="hidden">
+            <div class="text-center mt-8 mb-8">
+                <h2 class="text-2xl font-bold mb-2">Konfigurasi Sistem</h2>
+                <p class="text-sm text-slate-500 dark:text-slate-400">Tentukan saldo awal dan alokasi anggaran Anda.</p>
+            </div>
+            <div class="glass p-6 rounded-2xl mb-4">
+                <label class="block text-sm font-semibold mb-2 text-slate-700 dark:text-slate-300">Total Saldo Awal (Rp)</label>
+                <input type="text" inputmode="numeric" id="initBalance" onkeyup="formatInput(this); checkWarning();" class="w-full p-3.5 rounded-xl bg-slate-100 dark:bg-slate-800 focus:ring-2 focus:ring-brand outline-none mb-6 font-medium transition" placeholder="Contoh: 200.000">
+                
+                <div class="flex justify-between items-center mb-3">
+                    <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300">Kategori Anggaran</label>
+                    <button onclick="addBucketField()" class="text-xs font-semibold bg-brand/10 text-brand hover:bg-brand/20 px-3 py-1.5 rounded-lg transition">+ Tambah</button>
+                </div>
+                
+                <div id="bucketFieldsContainer" class="space-y-3 mb-5"></div>
+
+                <div id="budgetWarning" class="hidden flex items-center gap-2 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 p-3 rounded-lg mb-5">
+                    <span class="text-sm">⚠️</span>
+                    <p class="text-xs font-semibold">Peringatan: Total anggaran melebihi saldo.</p>
+                </div>
+                
+                <button onclick="saveSetup()" class="w-full bg-brand hover:bg-indigo-600 text-white font-bold py-4 rounded-xl active:scale-95 transition-all shadow-lg shadow-brand/30">Simpan Konfigurasi</button>
+            </div>
+        </div>
+
+        <!-- MAIN SPA CONTAINER -->
+        <div id="mainSpaView" class="hidden">
+            
+            <!-- VIEW: DASHBOARD -->
+            <div id="view-dashboard" class="spa-view block">
+                <div class="glass p-7 rounded-3xl mb-8 mt-2 relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-40 h-40 bg-brand opacity-20 rounded-full blur-3xl -mr-10 -mt-10"></div>
+                    <p class="text-sm font-semibold text-slate-500 dark:text-slate-400 mb-1">Total Saldo Saat Ini</p>
+                    <h2 class="text-4xl font-extrabold tracking-tight text-slate-800 dark:text-white" id="uiBalance">Rp 0</h2>
+                </div>
+
+                <div class="flex justify-between items-end mb-3">
+                    <h3 class="text-base font-bold text-slate-800 dark:text-slate-100">Alokasi Anggaran</h3>
+                    <button onclick="promptNewBucket()" class="text-xs font-semibold text-brand hover:text-indigo-400 transition">+ Tambah Kategori</button>
+                </div>
+                <div id="uiBucketsGrid" class="grid grid-cols-2 gap-4 mb-8"></div>
+
+                <h3 class="text-base font-bold text-slate-800 dark:text-slate-100 mb-3">Catat Transaksi Baru</h3>
+                <div class="glass p-6 rounded-2xl mb-10">
+                    <div class="mb-4">
+                        <label class="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1.5">Nominal Transaksi</label>
+                        <input type="text" inputmode="numeric" id="txAmount" onkeyup="formatInput(this)" class="w-full p-3.5 rounded-xl bg-slate-100 dark:bg-slate-800 focus:ring-2 focus:ring-brand outline-none font-medium transition" placeholder="Contoh: 50.000">
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1.5">Keterangan</label>
+                        <input type="text" id="txNote" class="w-full p-3.5 rounded-xl bg-slate-100 dark:bg-slate-800 focus:ring-2 focus:ring-brand outline-none font-medium transition" placeholder="Contoh: Pembelian Makan Siang">
+                    </div>
+                    
+                    <div class="mb-5 relative">
+                        <label class="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1.5">Jenis Transaksi</label>
+                        <div class="relative" id="txTypeWrapper">
+                            <div id="txTypeTrigger" tabindex="0" role="combobox" aria-haspopup="listbox" aria-expanded="false" onclick="toggleCustomSelect()" onkeydown="handleSelectKeydown(event)" class="w-full p-3.5 rounded-xl bg-slate-100 dark:bg-slate-800 focus:ring-2 focus:ring-brand outline-none font-medium transition cursor-pointer flex items-center justify-between select-none border border-transparent dark:border-slate-700/50">
+                                <span class="text-slate-500 dark:text-slate-400" id="txTypeDisplay">Pilih Tujuan Transaksi...</span>
+                                <svg id="txTypeChevron" class="transition-transform duration-200 text-slate-400 shrink-0" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                            </div>
+                            <ul id="txTypeMenu" role="listbox" class="absolute top-full mt-2 left-0 right-0 z-50 rounded-xl shadow-xl bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-700 max-h-64 overflow-y-auto origin-top transition-all duration-200 invisible opacity-0 scale-95 pointer-events-none pb-2 pt-2"></ul>
+                        </div>
+                        <input type="hidden" id="txType" value="">
+                    </div>
+
+                    <div class="mb-6">
+                        <label class="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1.5">Unggah Bukti Transaksi (Opsional)</label>
+                        <input type="file" id="txImage" accept="image/*" class="w-full text-sm text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-brand/10 file:text-brand hover:file:bg-brand/20 transition cursor-pointer">
+                    </div>
+
+                    <button onclick="addTransaction()" class="w-full bg-brand hover:bg-indigo-600 text-white font-bold py-4 rounded-xl active:scale-95 transition-all shadow-lg shadow-brand/20">Simpan Transaksi</button>
+                </div>
+            </div>
+
+            <!-- VIEW: ANALITIK -->
+            <div id="view-analitik" class="spa-view hidden space-y-6 mt-2">
+                <div class="glass p-6 rounded-3xl">
+                    <h3 class="text-sm font-bold text-slate-800 dark:text-slate-100 mb-4 text-center">Distribusi Pengeluaran</h3>
+                    <div class="relative w-full aspect-square max-w-[280px] mx-auto">
+                        <canvas id="doughnutChart"></canvas>
+                    </div>
+                </div>
+                <div class="glass p-6 rounded-3xl">
+                    <h3 class="text-sm font-bold text-slate-800 dark:text-slate-100 mb-4 text-center">Arus Kas (7 Hari Terakhir)</h3>
+                    <div class="relative w-full h-64">
+                        <canvas id="barChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: RIWAYAT -->
+            <div id="view-riwayat" class="spa-view hidden mt-2">
+                <div class="glass p-6 rounded-3xl mb-6">
+                    <h3 class="text-sm font-bold text-slate-800 dark:text-slate-100 mb-2">Ekspor Laporan (Offline)</h3>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mb-4">Pilih rentang tanggal (kosongkan untuk ekspor seluruh data).</p>
+                    
+                    <div class="flex items-center gap-2 mb-4">
+                        <input type="date" id="exportStartDate" class="w-1/2 p-2.5 rounded-xl text-xs font-medium bg-slate-100 dark:bg-slate-800 border-none outline-none focus:ring-2 focus:ring-brand text-slate-700 dark:text-slate-300">
+                        <span class="text-slate-400 font-bold">-</span>
+                        <input type="date" id="exportEndDate" class="w-1/2 p-2.5 rounded-xl text-xs font-medium bg-slate-100 dark:bg-slate-800 border-none outline-none focus:ring-2 focus:ring-brand text-slate-700 dark:text-slate-300">
+                    </div>
+                    
+                    <div class="flex gap-3">
+                        <button onclick="exportPDF()" class="flex-1 bg-brand/10 hover:bg-brand/20 text-brand font-bold py-3 rounded-xl transition text-sm flex items-center justify-center gap-2">
+                            📄 PDF
+                        </button>
+                        <button onclick="exportCSV()" class="flex-1 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-bold py-3 rounded-xl transition text-sm flex items-center justify-center gap-2">
+                            📊 CSV
+                        </button>
+                    </div>
+                </div>
+
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-base font-bold text-slate-800 dark:text-slate-100">Riwayat Transaksi</h3>
+                    <input type="date" id="dateFilter" onchange="loadLogs()" class="text-xs p-2 rounded-lg bg-slate-200 dark:bg-slate-800 border-none outline-none font-medium text-slate-700 dark:text-slate-300">
+                </div>
+                <div id="logList" class="space-y-4"></div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- BOTTOM NAVIGATION -->
+    <nav id="bottomNav" class="hidden fixed bottom-0 w-full max-w-md left-1/2 -translate-x-1/2 glass border-t border-slate-200 dark:border-slate-800 z-40 pb-safe shadow-[0_-10px_40px_rgba(0,0,0,0.05)] dark:shadow-[0_-10px_40px_rgba(0,0,0,0.3)]">
+        <div class="flex justify-around items-center p-2">
+            <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-item active flex flex-col items-center gap-1 p-2 text-slate-400 hover:text-brand transition w-20">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                <span class="text-[10px] font-bold">Utama</span>
+            </button>
+            <button onclick="switchTab('analitik')" id="nav-analitik" class="nav-item flex flex-col items-center gap-1 p-2 text-slate-400 hover:text-brand transition w-20">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" x2="18" y1="20" y2="10"></line><line x1="12" x2="12" y1="20" y2="4"></line><line x1="6" x2="6" y1="20" y2="14"></line></svg>
+                <span class="text-[10px] font-bold">Analitik</span>
+            </button>
+            <button onclick="switchTab('riwayat')" id="nav-riwayat" class="nav-item flex flex-col items-center gap-1 p-2 text-slate-400 hover:text-brand transition w-20">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"></path><path d="m19 9-5 5-4-4-3 3"></path></svg>
+                <span class="text-[10px] font-bold">Riwayat</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- SETTINGS MODAL -->
+    <div id="settingsModal" class="fixed inset-0 bg-slate-900/40 dark:bg-black/60 backdrop-blur-sm z-50 hidden flex-col justify-end sm:justify-center items-center transition-opacity opacity-0">
+        <div class="bg-white dark:bg-slate-900 w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 sm:p-8 shadow-2xl transform translate-y-full transition-transform duration-300" id="settingsContent">
+            
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold">Pengaturan</h2>
+                <button onclick="toggleSettings()" class="p-2 bg-slate-100 dark:bg-slate-800 rounded-full text-slate-500 hover:text-slate-800 dark:hover:text-white transition">✕</button>
+            </div>
+
+            <div class="mb-6">
+                <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">Tampilan</p>
+                <button onclick="toggleTheme()" class="w-full flex justify-between items-center p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+                    <span class="font-semibold">Mode Gelap / Terang</span>
+                    <span id="themeTextIcon" class="text-xl">🌙</span>
+                </button>
+            </div>
+
+            <div>
+                <p class="text-xs font-semibold text-red-500 mb-2 uppercase tracking-wider">Zona Berbahaya</p>
+                <div class="p-4 bg-red-50 dark:bg-red-900/10 rounded-xl border border-red-200 dark:border-red-900/30">
+                    <p class="text-xs text-red-600 dark:text-red-400 mb-3">Menghapus seluruh data saldo, anggaran, dan riwayat transaksi.</p>
+                    <button onclick="resetApp()" class="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-3 rounded-xl transition shadow-lg shadow-red-500/20">Reset Seluruh Data</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // --- 0. SPA ROUTING ---
+        function switchTab(tab) {
+            // Hide all views
+            document.querySelectorAll('.spa-view').forEach(el => {
+                el.classList.remove('block');
+                el.classList.add('hidden');
+            });
+            // Show target view
+            document.getElementById('view-' + tab).classList.remove('hidden');
+            document.getElementById('view-' + tab).classList.add('block');
+            
+            // Update nav styles
+            document.querySelectorAll('.nav-item').forEach(el => {
+                el.classList.remove('active', 'text-brand');
+                el.classList.add('text-slate-400');
+            });
+            
+            const activeNav = document.getElementById('nav-' + tab);
+            activeNav.classList.remove('text-slate-400');
+            activeNav.classList.add('active', 'text-brand');
+
+            // Render charts if analitik tab
+            if(tab === 'analitik') {
+                renderCharts();
+            }
+            
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // --- 1. THEME & MODAL ENGINE ---
+        function toggleTheme() {
+            document.documentElement.classList.toggle('dark');
+            const isDark = document.documentElement.classList.contains('dark');
+            document.getElementById('themeTextIcon').innerText = isDark ? '☀️' : '🌙';
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            
+            // Re-render charts if in analitik view to update colors
+            if(!document.getElementById('view-analitik').classList.contains('hidden')) {
+                renderCharts();
+            }
+        }
+        if(localStorage.getItem('theme') === 'light') toggleTheme();
+
+        function toggleSettings() {
+            const modal = document.getElementById('settingsModal');
+            const content = document.getElementById('settingsContent');
+            if(modal.classList.contains('hidden')) {
+                modal.classList.remove('hidden');
+                setTimeout(() => {
+                    modal.classList.remove('opacity-0');
+                    content.classList.remove('translate-y-full');
+                }, 10);
+            } else {
+                modal.classList.add('opacity-0');
+                content.classList.add('translate-y-full');
+                setTimeout(() => modal.classList.add('hidden'), 300);
+            }
+        }
+
+        // --- 2. FORMATTER UTILS ---
+        function formatRupiah(number) { return new Intl.NumberFormat('id-ID').format(number); }
+        function parseRupiah(str) { return parseInt(str.replace(/[^0-9]/g, '')) || 0; }
+        function formatInput(elm) {
+            let val = parseRupiah(elm.value);
+            elm.value = val === 0 ? '' : formatRupiah(val);
+        }
+
+        // --- 3. INDEXED DB SETUP ---
+        let db;
+        const request = indexedDB.open("BdzhrPlannerDB", 1);
+        request.onupgradeneeded = e => {
+            db = e.target.result;
+            if(!db.objectStoreNames.contains('transactions')) db.createObjectStore('transactions', { keyPath: 'id' });
+        };
+        request.onsuccess = e => { db = e.target.result; checkSetup(); };
+
+        // --- 4. STATE MANAGEMENT & SETUP ---
+        let state = JSON.parse(localStorage.getItem('bdzhrDataProd')) || null;
+        let bucketIdCounter = 1;
+
+        function checkSetup() {
+            if(!state) {
+                document.getElementById('setupView').classList.remove('hidden');
+                document.getElementById('mainSpaView').classList.add('hidden');
+                document.getElementById('bottomNav').classList.add('hidden');
+                if(document.getElementById('bucketFieldsContainer').innerHTML.trim() === '') {
+                    addBucketField('Kebutuhan Pokok');
+                    addBucketField('Transportasi');
+                }
+            } else {
+                document.getElementById('setupView').classList.add('hidden');
+                document.getElementById('mainSpaView').classList.remove('hidden');
+                document.getElementById('bottomNav').classList.remove('hidden');
+                updateUI();
+                loadLogs();
+            }
+        }
+
+        function addBucketField(defaultName = '') {
+            const container = document.getElementById('bucketFieldsContainer');
+            const id = 'bkt_' + bucketIdCounter++;
+            const html = `
+                <div class="flex gap-2 bucket-input-group items-center" id="${id}">
+                    <input type="text" class="w-1/2 p-3 rounded-xl bg-slate-100 dark:bg-slate-800 outline-none text-sm font-medium bucket-name" placeholder="Nama Kategori" value="${defaultName}">
+                    <input type="text" inputmode="numeric" onkeyup="formatInput(this); checkWarning();" class="w-1/2 p-3 rounded-xl bg-slate-100 dark:bg-slate-800 outline-none text-sm font-medium bucket-amount" placeholder="Anggaran (Rp)">
+                    <button onclick="document.getElementById('${id}').remove(); checkWarning();" class="text-slate-400 hover:text-red-500 font-bold px-3 py-2 transition">✕</button>
+                </div>
+            `;
+            container.insertAdjacentHTML('beforeend', html);
+        }
+
+        function checkWarning() {
+            const totalBal = parseRupiah(document.getElementById('initBalance').value);
+            let totalBudget = 0;
+            document.querySelectorAll('.bucket-amount').forEach(el => totalBudget += parseRupiah(el.value));
+            
+            const warnLabel = document.getElementById('budgetWarning');
+            if(totalBudget > totalBal && totalBal > 0) warnLabel.classList.remove('hidden');
+            else warnLabel.classList.add('hidden');
+        }
+
+        function saveSetup() {
+            const bal = parseRupiah(document.getElementById('initBalance').value);
+            if(bal <= 0) return alert("Perhatian: Saldo awal harus diisi dengan benar.");
+
+            let buckets = [];
+            document.querySelectorAll('.bucket-input-group').forEach(group => {
+                const name = group.querySelector('.bucket-name').value || 'Tanpa Kategori';
+                const amount = parseRupiah(group.querySelector('.bucket-amount').value);
+                buckets.push({ id: group.id, name: name, allocated: amount, current: amount });
+            });
+
+            state = { balance: bal, buckets: buckets };
+            localStorage.setItem('bdzhrDataProd', JSON.stringify(state));
+            checkSetup();
+        }
+
+        // --- 5. MAIN UI & DYNAMIC BUCKETS ---
+        function promptNewBucket() {
+            const name = prompt("Masukkan nama kategori anggaran baru:");
+            if(!name) return;
+            const amtStr = prompt("Masukkan nominal anggaran yang dialokasikan (Rp):");
+            const amt = parseRupiah(amtStr || '0');
+            
+            if (state.balance < amt) {
+                alert("Perhatian: Saldo utama tidak mencukupi untuk alokasi anggaran ini.");
+                return;
+            }
+
+            state.balance -= amt; 
+            state.buckets.push({ id: 'bkt_' + Date.now(), name: name, allocated: amt, current: amt });
+            updateUI();
+        }
+
+        function deleteBucket(id, name) {
+            if(confirm(`Kategori "${name}" akan dihapus. Sisa anggaran akan dikembalikan ke Saldo Utama. Lanjutkan?`)) {
+                const index = state.buckets.findIndex(b => b.id === id);
+                if(index > -1) {
+                    state.balance += state.buckets[index].current; 
+                    state.buckets.splice(index, 1);
+                    updateUI();
+                }
+            }
+        }
+
+        function updateUI() {
+            document.getElementById('uiBalance').innerText = 'Rp ' + formatRupiah(state.balance);
+            
+            const grid = document.getElementById('uiBucketsGrid');
+            grid.innerHTML = '';
+            
+            // Rebuild custom dropdown menu
+            const menu = document.getElementById('txTypeMenu');
+            menu.innerHTML = '';
+
+            const createOption = (val, label, type) => {
+                const li = document.createElement('li');
+                li.setAttribute('role', 'option');
+                li.setAttribute('data-value', val);
+                
+                if (type === 'header') {
+                    li.className = 'px-4 py-2 text-[13px] text-slate-400 dark:text-slate-500 cursor-default font-normal';
+                    li.textContent = label;
+                } else if (type === 'separator') {
+                    li.className = 'my-2 border-t border-slate-200 dark:border-slate-700/60 w-[90%] mx-auto';
+                } else {
+                    li.className = 'px-4 py-2.5 text-sm font-medium cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800/80 transition-colors';
+                    if (type === 'income') li.classList.add('text-emerald-600', 'dark:text-emerald-400');
+                    else if (type === 'expense') li.classList.add('text-rose-600', 'dark:text-rose-400');
+                    
+                    li.textContent = label;
+                    li.addEventListener('click', () => selectCustomOption(val, label, type));
+                }
+                return li;
+            };
+
+            menu.appendChild(createOption('', 'Pilih Tujuan Transaksi...', 'header'));
+            menu.appendChild(createOption('income', 'Pemasukan / Tambah Saldo (+)', 'income'));
+            menu.appendChild(createOption('expense_other', 'Pengeluaran: Tak Terduga (-)', 'expense'));
+            menu.appendChild(createOption('', '', 'separator'));
+
+            const colors = ['border-amber-400', 'border-sky-400', 'border-indigo-400', 'border-emerald-400', 'border-rose-400'];
+            
+            state.buckets.forEach((b, index) => {
+                const colorClass = colors[index % colors.length];
+                grid.innerHTML += `
+                    <div class="glass p-5 rounded-2xl border-l-4 ${colorClass} relative hover:scale-[1.02] transition-transform">
+                        <button onclick="deleteBucket('${b.id}', '${b.name}')" class="absolute top-3 right-3 text-slate-400 hover:text-red-500 text-xs font-bold transition">✕</button>
+                        <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1.5 pr-4 truncate">${b.name}</p>
+                        <p class="text-lg font-bold text-slate-800 dark:text-slate-100">Rp ${formatRupiah(b.current)}</p>
+                    </div>
+                `;
+                menu.appendChild(createOption(b.id, `Pengeluaran: ${b.name} (-)`, 'expense'));
+            });
+
+            localStorage.setItem('bdzhrDataProd', JSON.stringify(state));
+        }
+
+        // --- 6. TRANSACTIONS ---
+        async function addTransaction() {
+            const amount = parseRupiah(document.getElementById('txAmount').value);
+            const note = document.getElementById('txNote').value || 'Tanpa Keterangan';
+            const target = document.getElementById('txType').value;
+            const fileInput = document.getElementById('txImage');
+            
+            if(amount <= 0) return alert("Perhatian: Nominal transaksi tidak valid.");
+            if(!target) return alert("Perhatian: Silakan pilih jenis transaksi.");
+
+            let typeLabel = "";
+            let isMinus = false;
+
+            if(target === 'income') {
+                state.balance += amount; 
+                typeLabel = "Pemasukan";
+            } else if (target === 'expense_other') {
+                state.balance -= amount;
+                typeLabel = "Pengeluaran Tak Terduga";
+                isMinus = true;
+            } else {
+                const bucketIndex = state.buckets.findIndex(b => b.id === target);
+                if(bucketIndex !== -1) {
+                    state.balance -= amount;
+                    state.buckets[bucketIndex].current -= amount;
+                    typeLabel = state.buckets[bucketIndex].name;
+                    isMinus = true;
+                }
+            }
+
+            let photoBase64 = null;
+            if(fileInput.files.length > 0) photoBase64 = await toBase64(fileInput.files[0]);
+
+            const now = new Date();
+            const rawDate = now.toISOString().split('T')[0]; 
+            const timeString = `${now.getDate().toString().padStart(2, '0')}/${(now.getMonth()+1).toString().padStart(2, '0')}/${now.getFullYear()} ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+
+            const txn = {
+                id: Date.now(),
+                amount: amount,
+                note: note,
+                typeLabel: typeLabel,
+                isMinus: isMinus,
+                timestamp: timeString,
+                rawDate: rawDate,
+                photo: photoBase64
+            };
+
+            const tx = db.transaction('transactions', 'readwrite');
+            tx.objectStore('transactions').add(txn);
+            
+            tx.oncomplete = () => {
+                document.getElementById('txAmount').value = '';
+                document.getElementById('txNote').value = '';
+                // Reset custom dropdown
+                document.getElementById('txType').value = '';
+                document.getElementById('txTypeDisplay').textContent = 'Pilih Tujuan Transaksi...';
+                document.getElementById('txTypeDisplay').className = 'text-slate-500 dark:text-slate-400';
+                document.querySelectorAll('#txTypeMenu li[data-value]').forEach(el => el.classList.remove('bg-slate-50', 'dark:bg-slate-800/50', 'font-bold'));
+                fileInput.value = '';
+                updateUI();
+                loadLogs();
+                // Optionally alert user or show toast
+                // switchTab('riwayat'); // Optional: redirect to history after save
+            };
+        }
+
+        // --- 7. LOGS & CALENDAR FILTER ---
+        function loadLogs() {
+            const list = document.getElementById('logList');
+            const filterDate = document.getElementById('dateFilter').value; 
+            list.innerHTML = ''; 
+
+            const tx = db.transaction('transactions', 'readonly');
+            const request = tx.objectStore('transactions').getAll();
+
+            request.onsuccess = () => {
+                let logs = request.result.reverse();
+                
+                if(filterDate) logs = logs.filter(log => log.rawDate === filterDate);
+
+                if(logs.length === 0) {
+                    list.innerHTML = `
+                        <div class="text-center p-6 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl">
+                            <p class="text-sm font-medium text-slate-500">Belum ada riwayat transaksi.</p>
+                        </div>`;
+                    return;
+                }
+
+                logs.forEach(log => {
+                    const color = log.isMinus ? 'text-rose-500' : 'text-emerald-500';
+                    const sign = log.isMinus ? '-' : '+';
+                    const imgTag = log.photo ? `<img src="${log.photo}" class="mt-4 w-full max-h-56 object-contain rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">` : '';
+
+                    list.innerHTML += `
+                        <div class="glass p-5 rounded-2xl flex flex-col">
+                            <div class="flex justify-between items-start mb-1">
+                                <div class="pr-3">
+                                    <p class="font-bold text-sm text-slate-800 dark:text-slate-100 leading-tight">${log.note}</p>
+                                    <p class="text-xs font-medium text-slate-500 dark:text-slate-400 mt-1">${log.typeLabel} • ${log.timestamp}</p>
+                                </div>
+                                <p class="font-extrabold text-sm flex-shrink-0 ${color}">${sign}Rp ${formatRupiah(log.amount)}</p>
+                            </div>
+                            ${imgTag}
+                        </div>
+                    `;
+                });
+            };
+        }
+
+        // --- 8. CHART.JS ANALYTICS ---
+        let doughnutChartInstance = null;
+        let barChartInstance = null;
+
+        function renderCharts() {
+            const tx = db.transaction('transactions', 'readonly');
+            const req = tx.objectStore('transactions').getAll();
+            
+            req.onsuccess = () => {
+                const logs = req.result;
+                const isDark = document.documentElement.classList.contains('dark');
+                const textColor = isDark ? '#cbd5e1' : '#475569';
+                const gridColor = isDark ? '#334155' : '#e2e8f0';
+                
+                // --- Doughnut Chart (Expenses by Bucket) ---
+                const expensesByBucket = {};
+                logs.filter(l => l.isMinus).forEach(l => {
+                    expensesByBucket[l.typeLabel] = (expensesByBucket[l.typeLabel] || 0) + l.amount;
+                });
+                
+                const dCtx = document.getElementById('doughnutChart').getContext('2d');
+                if(doughnutChartInstance) doughnutChartInstance.destroy();
+                
+                const dColors = ['#6366f1', '#10b981', '#f43f5e', '#f59e0b', '#0ea5e9', '#8b5cf6', '#d946ef'];
+                
+                if (Object.keys(expensesByBucket).length === 0) {
+                    // Placeholder if no data
+                    doughnutChartInstance = new Chart(dCtx, {
+                        type: 'doughnut',
+                        data: { labels: ['Belum ada data'], datasets: [{ data: [1], backgroundColor: [isDark ? '#334155' : '#e2e8f0'], borderWidth: 0 }] },
+                        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: textColor } }, tooltip: { enabled: false } }, cutout: '70%' }
+                    });
+                } else {
+                    doughnutChartInstance = new Chart(dCtx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: Object.keys(expensesByBucket),
+                            datasets: [{
+                                data: Object.values(expensesByBucket),
+                                backgroundColor: dColors.slice(0, Object.keys(expensesByBucket).length),
+                                borderWidth: 0,
+                                hoverOffset: 4
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: { 
+                                legend: { position: 'bottom', labels: { color: textColor, padding: 20, font: { family: 'Inter' } } },
+                                tooltip: { callbacks: { label: function(context) { return ' Rp ' + formatRupiah(context.raw); } } }
+                            },
+                            cutout: '70%'
+                        }
+                    });
+                }
+
+                // --- Bar Chart (Income vs Expense - Last 7 Days) ---
+                const last7Days = Array.from({length: 7}, (_, i) => {
+                    const d = new Date();
+                    d.setDate(d.getDate() - i);
+                    return d.toISOString().split('T')[0];
+                }).reverse();
+
+                const incomeData = Array(7).fill(0);
+                const expenseData = Array(7).fill(0);
+
+                logs.forEach(l => {
+                    const idx = last7Days.indexOf(l.rawDate);
+                    if(idx !== -1) {
+                        if(l.isMinus) expenseData[idx] += l.amount;
+                        else incomeData[idx] += l.amount;
+                    }
+                });
+
+                const shortLabels = last7Days.map(d => {
+                    const parts = d.split('-');
+                    return `${parts[2]}/${parts[1]}`;
+                });
+
+                const bCtx = document.getElementById('barChart').getContext('2d');
+                if(barChartInstance) barChartInstance.destroy();
+
+                barChartInstance = new Chart(bCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: shortLabels,
+                        datasets: [
+                            { label: 'Pemasukan', data: incomeData, backgroundColor: '#10b981', borderRadius: 4, barPercentage: 0.6, categoryPercentage: 0.8 },
+                            { label: 'Pengeluaran', data: expenseData, backgroundColor: '#f43f5e', borderRadius: 4, barPercentage: 0.6, categoryPercentage: 0.8 }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: { 
+                                beginAtZero: true,
+                                ticks: { color: textColor, font: { family: 'Inter', size: 10 }, callback: function(value) { return value === 0 ? '0' : value >= 1000 ? (value/1000) + 'k' : value; } }, 
+                                grid: { color: gridColor, drawBorder: false } 
+                            },
+                            x: { 
+                                ticks: { color: textColor, font: { family: 'Inter', size: 10 } }, 
+                                grid: { display: false, drawBorder: false } 
+                            }
+                        },
+                        plugins: { 
+                            legend: { position: 'top', align: 'end', labels: { boxWidth: 10, usePointStyle: true, color: textColor, font: { family: 'Inter', size: 11 } } },
+                            tooltip: { callbacks: { label: function(context) { return ' Rp ' + formatRupiah(context.raw); } } }
+                        },
+                        interaction: { intersect: false, mode: 'index' }
+                    }
+                });
+            };
+        }
+
+        // --- 9. EXPORTS (PDF & CSV) ---
+        function getFilteredLogs(callback) {
+            const startDate = document.getElementById('exportStartDate').value;
+            const endDate   = document.getElementById('exportEndDate').value;
+            const calFilter = document.getElementById('dateFilter').value;
+
+            const tx = db.transaction('transactions', 'readonly');
+            const req = tx.objectStore('transactions').getAll();
+
+            req.onsuccess = () => {
+                let logs = req.result;
+
+                if (startDate && endDate) {
+                    logs = logs.filter(log => log.rawDate >= startDate && log.rawDate <= endDate);
+                } else if (startDate) {
+                    logs = logs.filter(log => log.rawDate === startDate);
+                } else if (calFilter) {
+                    logs = logs.filter(log => log.rawDate === calFilter);
+                }
+
+                const periodLabel = startDate && endDate
+                    ? `Periode: ${startDate} s/d ${endDate}`
+                    : startDate
+                        ? `Tanggal: ${startDate}`
+                        : calFilter
+                            ? `Tanggal: ${calFilter}`
+                            : 'Semua Data';
+                
+                const fileSafePeriod = startDate && endDate
+                    ? `${startDate}_to_${endDate}`
+                    : startDate ? startDate : calFilter ? calFilter : 'All';
+
+                callback(logs, periodLabel, fileSafePeriod);
+            };
+        }
+
+        function exportPDF() {
+            getFilteredLogs((logs, periodLabel, fileSafePeriod) => {
+                const totalIn  = logs.filter(l => !l.isMinus).reduce((s, l) => s + l.amount, 0);
+                const totalOut = logs.filter(l =>  l.isMinus).reduce((s, l) => s + l.amount, 0);
+
+                let rows = '';
+                if (logs.length === 0) {
+                    rows = `<tr><td colspan="4" style="text-align:center;padding:20px;color:#64748b;">Tidak ada transaksi pada periode ini.</td></tr>`;
+                } else {
+                    logs.forEach(log => {
+                        const color = log.isMinus ? 'color:#e11d48;' : 'color:#059669;';
+                        const sign  = log.isMinus ? '-' : '+';
+                        rows += `
+                            <tr style="page-break-inside: avoid;">
+                                <td style="padding:10px 14px;border-bottom:1px solid #e2e8f0;color:#475569;white-space:nowrap;">${log.timestamp}</td>
+                                <td style="padding:10px 14px;border-bottom:1px solid #e2e8f0;font-weight:bold;color:#0f172a;">${log.note}</td>
+                                <td style="padding:10px 14px;border-bottom:1px solid #e2e8f0;color:#475569;">${log.typeLabel}</td>
+                                <td style="padding:10px 14px;border-bottom:1px solid #e2e8f0;text-align:right;font-weight:bold;${color}">${sign}${formatRupiah(log.amount)}</td>
+                            </tr>`;
+                    });
+                }
+
+                const printHtml = `
+                    <div style="padding:36px;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;color:#1e293b;background:white;">
+                        <h1 style="text-align:center;color:#4f46e5;margin-bottom:4px;font-size:22px;">Bdzhr Planner — Laporan Transaksi</h1>
+                        <p style="text-align:center;font-size:11px;color:#64748b;margin-bottom:28px;">Dicetak pada: ${new Date().toLocaleString('id-ID')}<br>${periodLabel}</p>
+
+                        <div style="display:flex;gap:16px;margin-bottom:28px;">
+                            <div style="flex:1;padding:16px;border:1px solid #e2e8f0;border-radius:10px;background:#f8fafc;">
+                                <p style="margin:0 0 6px;font-size:11px;color:#64748b;">Saldo Akhir Sistem</p>
+                                <p style="margin:0;font-size:18px;font-weight:bold;color:#0f172a;">Rp ${formatRupiah(state.balance)}</p>
+                            </div>
+                            <div style="flex:1;padding:16px;border:1px solid #d1fae5;border-radius:10px;background:#f0fdf4;">
+                                <p style="margin:0 0 6px;font-size:11px;color:#059669;">Total Pemasukan</p>
+                                <p style="margin:0;font-size:18px;font-weight:bold;color:#059669;">+Rp ${formatRupiah(totalIn)}</p>
+                            </div>
+                            <div style="flex:1;padding:16px;border:1px solid #fee2e2;border-radius:10px;background:#fff1f2;">
+                                <p style="margin:0 0 6px;font-size:11px;color:#e11d48;">Total Pengeluaran</p>
+                                <p style="margin:0;font-size:18px;font-weight:bold;color:#e11d48;">-Rp ${formatRupiah(totalOut)}</p>
+                            </div>
+                        </div>
+
+                        <table style="width:100%;border-collapse:collapse;font-size:12px;">
+                            <thead>
+                                <tr style="background-color:#f1f5f9;text-align:left;">
+                                    <th style="padding:10px 14px;border-bottom:2px solid #cbd5e1;color:#334155;">Waktu</th>
+                                    <th style="padding:10px 14px;border-bottom:2px solid #cbd5e1;color:#334155;">Keterangan</th>
+                                    <th style="padding:10px 14px;border-bottom:2px solid #cbd5e1;color:#334155;">Kategori</th>
+                                    <th style="padding:10px 14px;border-bottom:2px solid #cbd5e1;text-align:right;color:#334155;">Nominal (Rp)</th>
+                                </tr>
+                            </thead>
+                            <tbody>${rows}</tbody>
+                        </table>
+                    </div>`;
+
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = printHtml;
+                document.body.appendChild(tempDiv);
+
+                const opt = {
+                    margin:      [0.4, 0.4, 0.4, 0.4],
+                    filename:    `Laporan-Bdzhr-${fileSafePeriod}.pdf`,
+                    image:       { type: 'jpeg', quality: 0.95 },
+                    html2canvas: { scale: 2, useCORS: true, logging: false },
+                    jsPDF:       { unit: 'in', format: 'a4', orientation: 'portrait' },
+                    pagebreak:   { mode: ['avoid-all', 'css', 'legacy'] }
+                };
+
+                html2pdf().set(opt).from(tempDiv.firstElementChild).save().then(() => {
+                    document.body.removeChild(tempDiv);
+                });
+            });
+        }
+
+        function exportCSV() {
+            getFilteredLogs((logs, periodLabel, fileSafePeriod) => {
+                if(logs.length === 0) {
+                    alert("Tidak ada data untuk diekspor pada periode ini.");
+                    return;
+                }
+
+                // CSV Header
+                let csvContent = "ID,Tanggal,Waktu,Keterangan,Kategori,Tipe,Nominal\n";
+
+                logs.forEach(log => {
+                    const type = log.isMinus ? "Pengeluaran" : "Pemasukan";
+                    // Escape double quotes inside the note for CSV standard
+                    const safeNote = `"${log.note.replace(/"/g, '""')}"`;
+                    const safeCategory = `"${log.typeLabel}"`;
+                    const [datePart, timePart] = log.timestamp.split(' ');
+                    
+                    csvContent += `${log.id},${log.rawDate},${timePart},${safeNote},${safeCategory},${type},${log.amount}\n`;
+                });
+
+                // Create Blob and trigger download (100% Offline)
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement("a");
+                
+                link.setAttribute("href", url);
+                link.setAttribute("download", `BdzhrPlanner_${fileSafePeriod}.csv`);
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+            });
+        }
+
+        // --- 10. UTILS ---
+        function toBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader(); reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result); reader.onerror = error => reject(error);
+            });
+        }
+        
+        function resetApp() {
+            if (!confirm("PERINGATAN: Apakah Anda yakin ingin menghapus seluruh data? Tindakan ini tidak dapat dibatalkan.")) return;
+
+            localStorage.removeItem('bdzhrDataProd');
+            state = null;
+
+            try {
+                const tx = db.transaction('transactions', 'readwrite');
+                const clearReq = tx.objectStore('transactions').clear();
+                clearReq.onerror = () => location.reload();
+                tx.oncomplete = () => location.reload();
+                tx.onerror    = () => location.reload();
+            } catch (e) { location.reload(); }
+        }
+
+        // --- 11. CUSTOM DROPDOWN LOGIC ---
+        function toggleCustomSelect(forceClose = false) {
+            const trigger = document.getElementById('txTypeTrigger');
+            const chevron = document.getElementById('txTypeChevron');
+            const menu    = document.getElementById('txTypeMenu');
+            
+            const isOpen = menu.classList.contains('visible');
+            
+            if (forceClose || isOpen) {
+                menu.classList.remove('visible', 'opacity-100', 'scale-100', 'pointer-events-auto');
+                menu.classList.add('invisible', 'opacity-0', 'scale-95', 'pointer-events-none');
+                chevron.classList.remove('rotate-180');
+                trigger.classList.remove('ring-2', 'ring-brand');
+                trigger.setAttribute('aria-expanded', 'false');
+            } else {
+                menu.classList.remove('invisible', 'opacity-0', 'scale-95', 'pointer-events-none');
+                menu.classList.add('visible', 'opacity-100', 'scale-100', 'pointer-events-auto');
+                chevron.classList.add('rotate-180');
+                trigger.classList.add('ring-2', 'ring-brand');
+                trigger.setAttribute('aria-expanded', 'true');
+            }
+        }
+
+        function selectCustomOption(value, label, type) {
+            document.getElementById('txType').value = value;
+            const display = document.getElementById('txTypeDisplay');
+            display.textContent = label;
+            
+            display.className = 'font-medium truncate ' + (
+                type === 'income' ? 'text-emerald-600 dark:text-emerald-400' : 
+                type === 'expense' ? 'text-rose-600 dark:text-rose-400' : 
+                'text-slate-800 dark:text-slate-100'
+            );
+            
+            document.querySelectorAll('#txTypeMenu li[data-value]').forEach(el => {
+                if(el.getAttribute('data-value') === value && value !== '') {
+                    el.classList.add('bg-slate-50', 'dark:bg-slate-800/50', 'font-bold');
+                } else {
+                    el.classList.remove('bg-slate-50', 'dark:bg-slate-800/50', 'font-bold');
+                }
+            });
+            toggleCustomSelect(true);
+        }
+
+        function handleSelectKeydown(e) {
+            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleCustomSelect(); }
+            if (e.key === 'Escape') toggleCustomSelect(true);
+        }
+
+        document.addEventListener('click', e => {
+            const wrapper = document.getElementById('txTypeWrapper');
+            if (wrapper && !wrapper.contains(e.target)) toggleCustomSelect(true);
+        });
+    </script>
+</body>
+</html>
