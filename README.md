@@ -1,60 +1,70 @@
-# 💸 Bdzhr Planner (PWA)
+# Bdzhr Planner OS 🚀
 
-![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)
-![PWA](https://img.shields.io/badge/PWA-Ready-success)
-![License](https://img.shields.io/badge/license-MIT-green)
+<div align="center">
+  <p><strong>A Premium, Offline-First Personal Finance & Wishlist Tracker</strong></p>
+</div>
 
-Bdzhr Planner is a blazing-fast, Offline-First Progressive Web Application (PWA) designed for precise personal finance tracking and dynamic budget allocation. Built with Vanilla JavaScript and Tailwind CSS, it prioritizes speed, local data security, and seamless mobile UX without the overhead of heavy frameworks.
+![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white)
+![JavaScript](https://img.shields.io/badge/JavaScript-323330?style=for-the-badge&logo=javascript&logoColor=F7DF1E)
+![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
+![PWA Ready](https://img.shields.io/badge/PWA-Ready-8A2BE2?style=for-the-badge&logo=pwa&logoColor=white)
+![Local First](https://img.shields.io/badge/Local_First-10B981?style=for-the-badge&logo=sqlite&logoColor=white)
+
+---
+
+## 📌 Overview
+
+**Bdzhr Planner** is a high-performance, single-page Personal Finance Operating System built entirely with Vanilla JavaScript, HTML5, and Tailwind CSS. Designed to be a **100% offline-first Progressive Web App (PWA)**, it requires zero backend servers to function. All your transaction history, budgets, and savings goals are securely stored locally within your browser using **IndexedDB**. 
+
+The UI takes inspiration from premium "Bento Box" layouts, offering an incredibly smooth and responsive experience packed with dynamic micro-animations, glassmorphism elements, and robust theme support.
 
 ## ✨ Key Features
 
-- **Offline-First Architecture:** Powered by Service Workers and IndexedDB. Your financial data stays on your device. Zero loading screens, zero network latency.
-- **Dynamic Bucket Budgeting:** Create custom budget categories on the fly. The system automatically prevents budget over-allocation based on the initial balance.
-- **Comprehensive Analytics:** Integrated with Chart.js to provide real-time Doughnut Charts (Expense Distribution) and Bar Charts (Cash Flow Trends).
-- **Export Capabilities:** \* **PDF Generation:** Clean, professional-grade financial reports generated purely on the client side using `html2pdf.js`.
-  - **CSV Export:** One-click data export using native Blob APIs for deep data analysis in Excel/Sheets.
-- **Dark Mode Ready:** A sleek, cyberpunk-inspired dark theme and a clean light theme, fully responsive for all screen sizes.
+- 📱 **Progressive Web App (PWA):** Installable on Android, iOS, and Desktop. Works entirely offline using Service Workers.
+- 🎨 **Dynamic Bento UI:** Sleek, modular dashboard layout featuring Light, Dark (Vantablack), and Pink (Cyber Pink) themes.
+- 🗄️ **Local-First Architecture:** Powered by `IndexedDB`. Your data never leaves your device unless you want it to.
+- 📊 **Smart Analytics:** Real-time Chart.js integration showing Expense Distribution and 7-Day Cashflow.
+- 🎯 **Target Menabung (Wishlist):** Set specific savings goals (like buying a phone or a car), allocate funds to them directly, and track your progress through interactive progress bars.
+- 🔄 **WebRTC P2P Sync:** Sync your entire financial database directly to another device over the air using PeerJS—no servers, no cloud storage needed.
+- 📄 **PDF & CSV Export:** Generate beautiful offline PDF reports or export your data to CSV formats instantly using `html2pdf.js`.
 
-## 🛠️ Tech Stack
+## 🚀 Getting Started
 
-- **Frontend:** HTML5, Vanilla JavaScript (ES6+), Tailwind CSS (via CDN).
-- **Storage:** IndexedDB (Transaction History), LocalStorage (State Management).
-- **Libraries:** `html2pdf.js` (PDF Generation), `Chart.js` (Data Visualization).
+Since Bdzhr Planner requires no backend dependencies or build steps, deploying or testing the app is incredibly simple.
 
-## 🚀 Local Installation
-
-Since Bdzhr Planner is a static, serverless application, running it locally is incredibly straightforward:
-
+### 1. Run Locally
+To run the app locally, you just need a local server to avoid CORS issues with IndexedDB and Service Workers.
 1. Clone the repository:
-
    ```bash
-   git clone [https://github.com/yourusername/bdzhr-planner.git](https://github.com/yourusername/bdzhr-planner.git)
-
-    Navigate to the project directory:
-    Bash
-
-    cd bdzhr-planner
-
-    Run it using any local server (e.g., VS Code Live Server, Python HTTP server):
-    Bash
-
-    python -m http.server 8000
-
-    Open http://localhost:8000 in your browser.
+   git clone https://github.com/yourusername/bdzhr-planner.git
    ```
+2. Open the folder and use an extension like **Live Server** in VSCode, or run a python server:
+   ```bash
+   python3 -m http.server 3000
+   ```
+3. Open `http://localhost:3000` in your browser.
 
-📱 PWA Installation (Mobile)
+### 2. Deploy to Netlify / Vercel / GitHub Pages
+Deploying is as easy as dragging and dropping the project folder!
+1. Go to [Netlify Drop](https://app.netlify.com/drop).
+2. Drag and drop the entire project directory.
+3. Your PWA is live and ready to be installed on any device!
 
-To install this app on your mobile device natively:
+## 🛠️ Built With
 
-    Visit the live deployment URL via Chrome (Android) or Safari (iOS).
+- **Vanilla JavaScript** (No React/Vue overhead)
+- **Tailwind CSS v3** (via CDN for rapid styling)
+- **IndexedDB API** (Local storage engine)
+- **Chart.js** (Data visualization)
+- **PeerJS** (WebRTC P2P Sync)
+- **html2pdf.js** (Client-side PDF rendering)
 
-    Tap the browser menu and select "Add to Home Screen".
+## 🔒 Privacy First
 
-    The app will now function independently, fully offline, directly from your app drawer.
+**Your data is yours.** The application makes zero HTTP requests to external databases. Everything is stored locally via `IndexedDB`. The WebRTC synchronization feature establishes a direct peer-to-peer connection to transfer data strictly between your authorized devices.
 
-📄 License
+---
 
-This project is licensed under the MIT License.
-
-## Built with ❤️ by (Nabil A. Dika).
+<div align="center">
+  <p>Designed and Built by <strong>J.A.R.V.I.S / Antigravity</strong></p>
+</div>

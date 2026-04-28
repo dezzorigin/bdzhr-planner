@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="id" class="dark">
+<html lang="id" class="theme-dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -21,39 +21,79 @@
   }
 </script>
 
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
     <script>
         tailwind.config = {
             darkMode: 'class',
-            theme: { extend: { colors: { brand: '#6366f1' } } }
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['"Inter"', 'sans-serif'] },
+                    colors: {
+                        brand: 'var(--color-brand)',
+                        brandGlow: 'var(--color-brand-glow)',
+                        bgPrime: 'var(--color-bg-prime)',
+                        card: 'var(--color-card)',
+                        textMain: 'var(--color-text-main)',
+                        textMuted: 'var(--color-text-muted)',
+                    }
+                }
+            }
         }
     </script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-        body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
-        .glass { background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.2); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
-        .dark .glass { background: rgba(30, 41, 59, 0.6); border: 1px solid rgba(255, 255, 255, 0.05); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
-        ::-webkit-scrollbar { width: 0px; background: transparent; }
-        input[type="date"]::-webkit-calendar-picker-indicator { cursor: pointer; opacity: 0.6; transition: 0.2s; }
-        input[type="date"]::-webkit-calendar-picker-indicator:hover { opacity: 1; }
-        .dark input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); }
         
+        :root, html.theme-light {
+            --color-brand: #6366f1;
+            --color-brand-glow: rgba(99, 102, 241, 0.4);
+            --color-bg-prime: #f8fafc;
+            --color-card: rgba(255, 255, 255, 0.7);
+            --color-text-main: #0f172a;
+            --color-text-muted: #64748b;
+            --color-border: rgba(15, 23, 42, 0.08);
+        }
+        
+        html.theme-dark {
+            --color-brand: #818cf8;
+            --color-brand-glow: rgba(129, 140, 248, 0.4);
+            --color-bg-prime: #0B0F19;
+            --color-card: rgba(30, 41, 59, 0.5);
+            --color-text-main: #f8fafc;
+            --color-text-muted: #94a3b8;
+            --color-border: rgba(255, 255, 255, 0.08);
+        }
 
+        html.theme-pink {
+            --color-brand: #db2777;
+            --color-brand-glow: rgba(219, 39, 119, 0.4);
+            --color-bg-prime: #fdf2f8;
+            --color-card: rgba(255, 255, 255, 0.6);
+            --color-text-main: #831843;
+            --color-text-muted: #be185d;
+            --color-border: rgba(219, 39, 119, 0.15);
+        }
 
-        /* Nav active state */
-        .nav-item.active { color: #6366f1; }
+        body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; background-color: var(--color-bg-prime); color: var(--color-text-main); }
+        .bento-card { background: var(--color-card); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border: 1px solid var(--color-border); box-shadow: 0 10px 40px -10px rgba(0,0,0,0.05); border-radius: 24px; padding: 24px; }
+        ::-webkit-scrollbar { width: 0px; background: transparent; }
+        
+        .glass-header { background: linear-gradient(to bottom, var(--color-bg-prime) 40%, transparent); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+        .glass-nav { background: var(--color-card); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border-top: 1px solid var(--color-border); }
+        
+        .nav-item.active { color: var(--color-brand); }
+        .nav-item.active svg { filter: drop-shadow(0 4px 6px var(--color-brand-glow)); transform: scale(1.1); }
         .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
     </style>
 </head>
-<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 transition-colors duration-300 relative min-h-screen flex flex-col">
+<body class="transition-colors duration-300 relative min-h-screen flex flex-col">
 
-    <header class="sticky top-0 z-40 glass border-b border-slate-200 dark:border-slate-800 px-5 py-4 flex justify-between items-center">
+    <header class="sticky top-0 z-40 glass-header px-6 pt-8 pb-4 flex justify-between items-center">
         <h1 class="text-xl font-extrabold tracking-tight">Bdzhr<span class="text-brand">Planner</span></h1>
-        <button onclick="toggleSettings()" class="p-2.5 rounded-lg bg-slate-200 dark:bg-slate-800 text-sm hover:bg-slate-300 dark:hover:bg-slate-700 transition flex items-center gap-2 font-semibold">
-            <span>⚙️</span> <span class="hidden sm:inline">Pengaturan</span>
-        </button>
+        
     </header>
 
     <main class="p-5 max-w-md mx-auto w-full flex-grow pb-28" id="appContent">
@@ -62,14 +102,14 @@
         <div id="setupView" class="hidden">
             <div class="text-center mt-8 mb-8">
                 <h2 class="text-2xl font-bold mb-2">Konfigurasi Sistem</h2>
-                <p class="text-sm text-slate-500 dark:text-slate-400">Tentukan saldo awal dan alokasi anggaran Anda.</p>
+                <p class="text-sm text-textMuted">Tentukan saldo awal dan alokasi anggaran Anda.</p>
             </div>
-            <div class="glass p-6 rounded-2xl mb-4">
-                <label class="block text-sm font-semibold mb-2 text-slate-700 dark:text-slate-300">Total Saldo Awal (Rp)</label>
-                <input type="text" inputmode="numeric" id="initBalance" onkeyup="formatInput(this); checkWarning();" class="w-full p-3.5 rounded-xl bg-slate-100 dark:bg-slate-800 focus:ring-2 focus:ring-brand outline-none mb-6 font-medium transition" placeholder="Contoh: 200.000">
+            <div class="bento-card p-6 rounded-2xl mb-4">
+                <label class="block text-sm font-semibold mb-2 text-textMain">Total Saldo Awal (Rp)</label>
+                <input type="text" inputmode="numeric" id="initBalance" onkeyup="formatInput(this); checkWarning();" class="w-full p-3.5 rounded-xl bg-bgPrime border border-[var(--color-border)] focus:ring-2 focus:ring-brand outline-none mb-6 font-medium transition" placeholder="Contoh: 200.000">
                 
                 <div class="flex justify-between items-center mb-3">
-                    <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300">Kategori Anggaran</label>
+                    <label class="block text-sm font-semibold text-textMain">Kategori Anggaran</label>
                     <button onclick="addBucketField()" class="text-xs font-semibold bg-brand/10 text-brand hover:bg-brand/20 px-3 py-1.5 rounded-lg transition">+ Tambah</button>
                 </div>
                 
@@ -89,45 +129,45 @@
             
             <!-- VIEW: DASHBOARD -->
             <div id="view-dashboard" class="spa-view block">
-                <div class="glass p-7 rounded-3xl mb-8 mt-2 relative overflow-hidden">
+                <div class="bento-card p-7 rounded-3xl mb-8 mt-2 relative overflow-hidden">
                     <div class="absolute top-0 right-0 w-40 h-40 bg-brand opacity-20 rounded-full blur-3xl -mr-10 -mt-10"></div>
-                    <p class="text-sm font-semibold text-slate-500 dark:text-slate-400 mb-1">Total Saldo Saat Ini</p>
-                    <h2 class="text-4xl font-extrabold tracking-tight text-slate-800 dark:text-white" id="uiBalance">Rp 0</h2>
+                    <p class="text-sm font-semibold text-textMuted mb-1">Total Saldo Saat Ini</p>
+                    <h2 class="text-4xl font-extrabold tracking-tight text-textMain" id="uiBalance">Rp 0</h2>
                 </div>
 
                 <div class="flex justify-between items-end mb-3">
-                    <h3 class="text-base font-bold text-slate-800 dark:text-slate-100">Alokasi Anggaran</h3>
+                    <h3 class="text-base font-bold text-textMain">Alokasi Anggaran</h3>
                     <button onclick="promptNewBucket()" class="text-xs font-semibold text-brand hover:text-indigo-400 transition">+ Tambah Kategori</button>
                 </div>
                 <div id="uiBucketsGrid" class="grid grid-cols-2 gap-4 mb-8"></div>
 
-                <h3 class="text-base font-bold text-slate-800 dark:text-slate-100 mb-3">Catat Transaksi Baru</h3>
-                <div class="glass p-6 rounded-2xl mb-10">
+                <h3 class="text-base font-bold text-textMain mb-3">Catat Transaksi Baru</h3>
+                <div class="bento-card p-6 rounded-2xl mb-10">
                     <div class="mb-4">
-                        <label class="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1.5">Nominal Transaksi</label>
-                        <input type="text" inputmode="numeric" id="txAmount" onkeyup="formatInput(this)" class="w-full p-3.5 rounded-xl bg-slate-100 dark:bg-slate-800 focus:ring-2 focus:ring-brand outline-none font-medium transition" placeholder="Contoh: 50.000">
+                        <label class="block text-xs font-medium text-textMuted mb-1.5">Nominal Transaksi</label>
+                        <input type="text" inputmode="numeric" id="txAmount" onkeyup="formatInput(this)" class="w-full p-3.5 rounded-xl bg-bgPrime border border-[var(--color-border)] focus:ring-2 focus:ring-brand outline-none font-medium transition" placeholder="Contoh: 50.000">
                     </div>
                     
                     <div class="mb-4">
-                        <label class="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1.5">Keterangan</label>
-                        <input type="text" id="txNote" class="w-full p-3.5 rounded-xl bg-slate-100 dark:bg-slate-800 focus:ring-2 focus:ring-brand outline-none font-medium transition" placeholder="Contoh: Pembelian Makan Siang">
+                        <label class="block text-xs font-medium text-textMuted mb-1.5">Keterangan</label>
+                        <input type="text" id="txNote" class="w-full p-3.5 rounded-xl bg-bgPrime border border-[var(--color-border)] focus:ring-2 focus:ring-brand outline-none font-medium transition" placeholder="Contoh: Pembelian Makan Siang">
                     </div>
                     
                     <div class="mb-5 relative">
-                        <label class="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1.5">Jenis Transaksi</label>
+                        <label class="block text-xs font-medium text-textMuted mb-1.5">Jenis Transaksi</label>
                         <div class="relative" id="txTypeWrapper">
-                            <div id="txTypeTrigger" tabindex="0" role="combobox" aria-haspopup="listbox" aria-expanded="false" onclick="toggleCustomSelect()" onkeydown="handleSelectKeydown(event)" class="w-full p-3.5 rounded-xl bg-slate-100 dark:bg-slate-800 focus:ring-2 focus:ring-brand outline-none font-medium transition cursor-pointer flex items-center justify-between select-none border border-transparent dark:border-slate-700/50">
-                                <span class="text-slate-500 dark:text-slate-400" id="txTypeDisplay">Pilih Tujuan Transaksi...</span>
-                                <svg id="txTypeChevron" class="transition-transform duration-200 text-slate-400 shrink-0" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                            <div id="txTypeTrigger" tabindex="0" role="combobox" aria-haspopup="listbox" aria-expanded="false" onclick="toggleCustomSelect()" onkeydown="handleSelectKeydown(event)" class="w-full p-3.5 rounded-xl bg-bgPrime border border-[var(--color-border)] focus:ring-2 focus:ring-brand outline-none font-medium transition cursor-pointer flex items-center justify-between select-none border border-transparent dark:border-slate-700/50">
+                                <span class="text-textMuted" id="txTypeDisplay">Pilih Tujuan Transaksi...</span>
+                                <svg id="txTypeChevron" class="transition-transform duration-200 text-textMuted shrink-0" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
                             </div>
-                            <ul id="txTypeMenu" role="listbox" class="absolute top-full mt-2 left-0 right-0 z-50 rounded-xl shadow-xl bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-700 max-h-64 overflow-y-auto origin-top transition-all duration-200 invisible opacity-0 scale-95 pointer-events-none pb-2 pt-2"></ul>
+                            <ul id="txTypeMenu" role="listbox" class="absolute top-full mt-2 left-0 right-0 z-50 rounded-xl shadow-xl bg-white dark:bg-[#111827] border border-[var(--color-border)] max-h-64 overflow-y-auto origin-top transition-all duration-200 invisible opacity-0 scale-95 pointer-events-none pb-2 pt-2"></ul>
                         </div>
                         <input type="hidden" id="txType" value="">
                     </div>
 
                     <div class="mb-6">
-                        <label class="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1.5">Unggah Bukti Transaksi (Opsional)</label>
-                        <input type="file" id="txImage" accept="image/*" class="w-full text-sm text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-brand/10 file:text-brand hover:file:bg-brand/20 transition cursor-pointer">
+                        <label class="block text-xs font-medium text-textMuted mb-1.5">Unggah Bukti Transaksi (Opsional)</label>
+                        <input type="file" id="txImage" accept="image/*" class="w-full text-sm text-textMuted file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-brand/10 file:text-brand hover:file:bg-brand/20 transition cursor-pointer">
                     </div>
 
                     <button onclick="addTransaction()" class="w-full bg-brand hover:bg-indigo-600 text-white font-bold py-4 rounded-xl active:scale-95 transition-all shadow-lg shadow-brand/20">Simpan Transaksi</button>
@@ -136,30 +176,46 @@
 
             <!-- VIEW: ANALITIK -->
             <div id="view-analitik" class="spa-view hidden space-y-6 mt-2">
-                <div class="glass p-6 rounded-3xl">
-                    <h3 class="text-sm font-bold text-slate-800 dark:text-slate-100 mb-4 text-center">Distribusi Pengeluaran</h3>
+                <div class="bento-card p-6 rounded-3xl">
+                    <h3 class="text-sm font-bold text-textMain mb-4 text-center">Distribusi Pengeluaran</h3>
                     <div class="relative w-full aspect-square max-w-[280px] mx-auto">
                         <canvas id="doughnutChart"></canvas>
                     </div>
                 </div>
-                <div class="glass p-6 rounded-3xl">
-                    <h3 class="text-sm font-bold text-slate-800 dark:text-slate-100 mb-4 text-center">Arus Kas (7 Hari Terakhir)</h3>
+                <div class="bento-card p-6 rounded-3xl">
+                    <h3 class="text-sm font-bold text-textMain mb-4 text-center">Arus Kas (7 Hari Terakhir)</h3>
                     <div class="relative w-full h-64">
                         <canvas id="barChart"></canvas>
                     </div>
                 </div>
             </div>
 
+            
+            <!-- VIEW: WISHLIST -->
+            <div id="view-wishlist" class="spa-view hidden mt-2">
+                <div class="flex justify-between items-center mb-6">
+                    <div>
+                        <h2 class="text-2xl font-black text-textMain tracking-tight"><i class="fa-solid fa-bullseye text-brand mr-2"></i> Target Menabung</h2>
+                        <p class="text-xs text-textMuted mt-1 font-medium">Wujudkan barang impianmu satu per satu.</p>
+                    </div>
+                    <button onclick="promptNewWishlist()" class="w-10 h-10 rounded-xl bg-brand text-white flex items-center justify-center font-bold hover:opacity-80 transition shadow-[0_4px_12px_var(--color-brand-glow)]"><i class="fa-solid fa-plus"></i></button>
+                </div>
+                
+                <div id="wishlistContainer" class="space-y-4 mb-8">
+                    <!-- Wishlist Cards Injected by JS -->
+                </div>
+            </div>
+
             <!-- VIEW: RIWAYAT -->
             <div id="view-riwayat" class="spa-view hidden mt-2">
-                <div class="glass p-6 rounded-3xl mb-6">
-                    <h3 class="text-sm font-bold text-slate-800 dark:text-slate-100 mb-2">Ekspor Laporan (Offline)</h3>
-                    <p class="text-xs text-slate-500 dark:text-slate-400 mb-4">Pilih rentang tanggal (kosongkan untuk ekspor seluruh data).</p>
+                <div class="bento-card p-6 rounded-3xl mb-6">
+                    <h3 class="text-sm font-bold text-textMain mb-2">Ekspor Laporan (Offline)</h3>
+                    <p class="text-xs text-textMuted mb-4">Pilih rentang tanggal (kosongkan untuk ekspor seluruh data).</p>
                     
                     <div class="flex items-center gap-2 mb-4">
-                        <input type="date" id="exportStartDate" class="w-1/2 p-2.5 rounded-xl text-xs font-medium bg-slate-100 dark:bg-slate-800 border-none outline-none focus:ring-2 focus:ring-brand text-slate-700 dark:text-slate-300">
-                        <span class="text-slate-400 font-bold">-</span>
-                        <input type="date" id="exportEndDate" class="w-1/2 p-2.5 rounded-xl text-xs font-medium bg-slate-100 dark:bg-slate-800 border-none outline-none focus:ring-2 focus:ring-brand text-slate-700 dark:text-slate-300">
+                        <input type="date" id="exportStartDate" class="w-1/2 p-2.5 rounded-xl text-xs font-medium bg-bgPrime border border-[var(--color-border)] border-none outline-none focus:ring-2 focus:ring-brand text-textMain">
+                        <span class="text-textMuted font-bold">-</span>
+                        <input type="date" id="exportEndDate" class="w-1/2 p-2.5 rounded-xl text-xs font-medium bg-bgPrime border border-[var(--color-border)] border-none outline-none focus:ring-2 focus:ring-brand text-textMain">
                     </div>
                     
                     <div class="flex gap-3">
@@ -173,8 +229,8 @@
                 </div>
 
                 <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-base font-bold text-slate-800 dark:text-slate-100">Riwayat Transaksi</h3>
-                    <input type="date" id="dateFilter" onchange="loadLogs()" class="text-xs p-2 rounded-lg bg-slate-200 dark:bg-slate-800 border-none outline-none font-medium text-slate-700 dark:text-slate-300">
+                    <h3 class="text-base font-bold text-textMain">Riwayat Transaksi</h3>
+                    <input type="date" id="dateFilter" onchange="loadLogs()" class="text-xs p-2 rounded-lg bg-bgPrime border border-[var(--color-border)] border-none outline-none font-medium text-textMain">
                 </div>
                 <div id="logList" class="space-y-4"></div>
             </div>
@@ -183,38 +239,69 @@
     </main>
 
     <!-- BOTTOM NAVIGATION -->
-    <nav id="bottomNav" class="hidden fixed bottom-0 w-full max-w-md left-1/2 -translate-x-1/2 glass border-t border-slate-200 dark:border-slate-800 z-40 pb-safe shadow-[0_-10px_40px_rgba(0,0,0,0.05)] dark:shadow-[0_-10px_40px_rgba(0,0,0,0.3)]">
-        <div class="flex justify-around items-center p-2">
-            <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-item active flex flex-col items-center gap-1 p-2 text-slate-400 hover:text-brand transition w-20">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
-                <span class="text-[10px] font-bold">Utama</span>
+        <nav id="bottomNav" class="hidden fixed bottom-0 w-full max-w-md left-1/2 -translate-x-1/2 glass-nav z-40 pb-safe shadow-[0_-10px_40px_rgba(0,0,0,0.05)] rounded-t-[2.5rem] border-x border-[var(--color-border)]">
+        <div class="flex justify-around items-center h-20 px-2">
+            <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-item active flex flex-col items-center justify-center gap-1 h-full text-textMuted hover:text-brand transition w-16">
+                <i class="fa-solid fa-house text-xl"></i>
+                <span class="text-[9px] font-bold uppercase tracking-wider">Utama</span>
             </button>
-            <button onclick="switchTab('analitik')" id="nav-analitik" class="nav-item flex flex-col items-center gap-1 p-2 text-slate-400 hover:text-brand transition w-20">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" x2="18" y1="20" y2="10"></line><line x1="12" x2="12" y1="20" y2="4"></line><line x1="6" x2="6" y1="20" y2="14"></line></svg>
-                <span class="text-[10px] font-bold">Analitik</span>
+            <button onclick="switchTab('analitik')" id="nav-analitik" class="nav-item flex flex-col items-center justify-center gap-1 h-full text-textMuted hover:text-brand transition w-16">
+                <i class="fa-solid fa-chart-pie text-xl"></i>
+                <span class="text-[9px] font-bold uppercase tracking-wider">Analitik</span>
             </button>
-            <button onclick="switchTab('riwayat')" id="nav-riwayat" class="nav-item flex flex-col items-center gap-1 p-2 text-slate-400 hover:text-brand transition w-20">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"></path><path d="m19 9-5 5-4-4-3 3"></path></svg>
-                <span class="text-[10px] font-bold">Riwayat</span>
+            <button onclick="switchTab('wishlist')" id="nav-wishlist" class="nav-item flex flex-col items-center justify-center gap-1 h-full text-textMuted hover:text-brand transition w-16">
+                <i class="fa-solid fa-bullseye text-xl"></i>
+                <span class="text-[9px] font-bold uppercase tracking-wider">Target</span>
+            </button>
+            <button onclick="switchTab('riwayat')" id="nav-riwayat" class="nav-item flex flex-col items-center justify-center gap-1 h-full text-textMuted hover:text-brand transition w-16">
+                <i class="fa-solid fa-receipt text-xl"></i>
+                <span class="text-[9px] font-bold uppercase tracking-wider">Riwayat</span>
+            </button>
+            <button onclick="toggleSettings()" id="nav-settings" class="nav-item flex flex-col items-center justify-center gap-1 h-full text-textMuted hover:text-brand transition w-16">
+                <i class="fa-solid fa-gear text-xl"></i>
+                <span class="text-[9px] font-bold uppercase tracking-wider">Setting</span>
             </button>
         </div>
     </nav>
 
     <!-- SETTINGS MODAL -->
-    <div id="settingsModal" class="fixed inset-0 bg-slate-900/40 dark:bg-black/60 backdrop-blur-sm z-50 hidden flex-col justify-end sm:justify-center items-center transition-opacity opacity-0">
-        <div class="bg-white dark:bg-slate-900 w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 sm:p-8 shadow-2xl transform translate-y-full transition-transform duration-300" id="settingsContent">
+    <div id="settingsModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex-col justify-center items-center transition-opacity opacity-0">
+        <div class="bento-card relative w-full max-w-md mx-4 sm:mx-auto max-h-[90vh] overflow-y-auto transform translate-y-full transition-transform duration-300" id="settingsContent">
             
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-xl font-bold">Pengaturan</h2>
-                <button onclick="toggleSettings()" class="p-2 bg-slate-100 dark:bg-slate-800 rounded-full text-slate-500 hover:text-slate-800 dark:hover:text-white transition">✕</button>
+            <div class="flex justify-between items-center mb-6 sticky top-0 bg-var(--color-card) z-10 pb-2">
+<h2 class="text-2xl font-black text-textMain tracking-tight">Pengaturan</h2>
+<button onclick="toggleSettings()" class="w-10 h-10 rounded-full bg-bgPrime border border-[var(--color-border)] text-textMuted flex items-center justify-center hover:text-brand hover:border-brand transition"><i class="fa-solid fa-xmark"></i></button>
+</div>
+
+                        <div class="mb-6">
+                <p class="text-xs font-semibold text-brand mb-4 uppercase tracking-widest flex items-center gap-2"><i class="fa-solid fa-palette"></i> Tampilan Tema</p>
+                <div class="grid grid-cols-3 gap-3">
+                    <button onclick="setTheme('theme-light')" class="py-3 rounded-xl bg-[#f8fafc] text-slate-800 font-bold text-xs border border-[var(--color-border)] hover:shadow-md transition-all focus:ring-2 focus:ring-brand">Light</button>
+                    <button onclick="setTheme('theme-dark')" class="py-3 rounded-xl bg-[#0B0F19] text-white font-bold text-xs border border-[var(--color-border)] hover:shadow-md transition-all focus:ring-2 focus:ring-brand">Dark</button>
+                    <button onclick="setTheme('theme-pink')" class="py-3 rounded-xl bg-[#fdf2f8] text-pink-700 font-bold text-xs border border-[var(--color-border)] hover:shadow-md transition-all focus:ring-2 focus:ring-brand">Pink</button>
+                </div>
             </div>
 
-            <div class="mb-6">
-                <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">Tampilan</p>
-                <button onclick="toggleTheme()" class="w-full flex justify-between items-center p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
-                    <span class="font-semibold">Mode Gelap / Terang</span>
-                    <span id="themeTextIcon" class="text-xl">🌙</span>
-                </button>
+            <div class="mb-8">
+                <p class="text-xs font-semibold text-brand mb-4 uppercase tracking-widest flex items-center gap-2"><i class="fa-solid fa-sync"></i> P2P Device Sync</p>
+                <p class="text-[10px] text-textMuted font-medium mb-3">Sync data antar perangkat via WebRTC tanpa server.</p>
+                <div class="flex flex-col gap-3">
+                    <div>
+                        <label class="block text-[9px] font-bold text-textMuted uppercase mb-1">Your Device ID</label>
+                        <div class="flex gap-2">
+                            <input id="my-peer-id" type="text" readonly class="w-full bg-bgPrime border border-[var(--color-border)] rounded-xl p-2.5 text-textMain text-xs focus:outline-none opacity-70" placeholder="Not generated">
+                            <button onclick="initPeer()" class="px-3 bg-brand/10 text-brand rounded-xl font-bold hover:bg-brand hover:text-white transition"><i class="fa-solid fa-power-off"></i></button>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-[9px] font-bold text-textMuted uppercase mb-1">Connect to ID</label>
+                        <div class="flex gap-2">
+                            <input id="target-peer-id" type="text" placeholder="Target ID" class="w-full bg-bgPrime border border-[var(--color-border)] rounded-xl p-2.5 text-textMain text-xs focus:outline-none">
+                            <button onclick="connectAndSync()" class="px-3 bg-brand text-white rounded-xl font-bold hover:opacity-80 transition"><i class="fa-solid fa-link"></i></button>
+                        </div>
+                    </div>
+                </div>
+                <div id="sync-status" class="text-[10px] font-bold text-center mt-3 hidden text-brand bg-brand/10 p-2 rounded-lg border border-brand/20"></div>
             </div>
 
             <div>
@@ -243,11 +330,11 @@
             // Update nav styles
             document.querySelectorAll('.nav-item').forEach(el => {
                 el.classList.remove('active', 'text-brand');
-                el.classList.add('text-slate-400');
+                el.classList.add('text-textMuted');
             });
             
             const activeNav = document.getElementById('nav-' + tab);
-            activeNav.classList.remove('text-slate-400');
+            activeNav.classList.remove('text-textMuted');
             activeNav.classList.add('active', 'text-brand');
 
             // Render charts if analitik tab
@@ -332,9 +419,9 @@
             const id = 'bkt_' + bucketIdCounter++;
             const html = `
                 <div class="flex gap-2 bucket-input-group items-center" id="${id}">
-                    <input type="text" class="w-1/2 p-3 rounded-xl bg-slate-100 dark:bg-slate-800 outline-none text-sm font-medium bucket-name" placeholder="Nama Kategori" value="${defaultName}">
-                    <input type="text" inputmode="numeric" onkeyup="formatInput(this); checkWarning();" class="w-1/2 p-3 rounded-xl bg-slate-100 dark:bg-slate-800 outline-none text-sm font-medium bucket-amount" placeholder="Anggaran (Rp)">
-                    <button onclick="document.getElementById('${id}').remove(); checkWarning();" class="text-slate-400 hover:text-red-500 font-bold px-3 py-2 transition">✕</button>
+                    <input type="text" class="w-1/2 p-3 rounded-xl bg-bgPrime border border-[var(--color-border)] outline-none text-sm font-medium bucket-name" placeholder="Nama Kategori" value="${defaultName}">
+                    <input type="text" inputmode="numeric" onkeyup="formatInput(this); checkWarning();" class="w-1/2 p-3 rounded-xl bg-bgPrime border border-[var(--color-border)] outline-none text-sm font-medium bucket-amount" placeholder="Anggaran (Rp)">
+                    <button onclick="document.getElementById('${id}').remove(); checkWarning();" class="text-textMuted hover:text-red-500 font-bold px-3 py-2 transition">✕</button>
                 </div>
             `;
             container.insertAdjacentHTML('beforeend', html);
@@ -410,10 +497,10 @@
                 li.setAttribute('data-value', val);
                 
                 if (type === 'header') {
-                    li.className = 'px-4 py-2 text-[13px] text-slate-400 dark:text-slate-500 cursor-default font-normal';
+                    li.className = 'px-4 py-2 text-[13px] text-textMuted dark:text-textMuted cursor-default font-normal';
                     li.textContent = label;
                 } else if (type === 'separator') {
-                    li.className = 'my-2 border-t border-slate-200 dark:border-slate-700/60 w-[90%] mx-auto';
+                    li.className = 'my-2 border-t border-[var(--color-border)]/60 w-[90%] mx-auto';
                 } else {
                     li.className = 'px-4 py-2.5 text-sm font-medium cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800/80 transition-colors';
                     if (type === 'income') li.classList.add('text-emerald-600', 'dark:text-emerald-400');
@@ -435,10 +522,10 @@
             state.buckets.forEach((b, index) => {
                 const colorClass = colors[index % colors.length];
                 grid.innerHTML += `
-                    <div class="glass p-5 rounded-2xl border-l-4 ${colorClass} relative hover:scale-[1.02] transition-transform">
-                        <button onclick="deleteBucket('${b.id}', '${b.name}')" class="absolute top-3 right-3 text-slate-400 hover:text-red-500 text-xs font-bold transition">✕</button>
-                        <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1.5 pr-4 truncate">${b.name}</p>
-                        <p class="text-lg font-bold text-slate-800 dark:text-slate-100">Rp ${formatRupiah(b.current)}</p>
+                    <div class="bento-card p-5 rounded-2xl border-l-4 ${colorClass} relative hover:scale-[1.02] transition-transform">
+                        <button onclick="deleteBucket('${b.id}', '${b.name}')" class="absolute top-3 right-3 text-textMuted hover:text-red-500 text-xs font-bold transition">✕</button>
+                        <p class="text-xs font-semibold text-textMuted mb-1.5 pr-4 truncate">${b.name}</p>
+                        <p class="text-lg font-bold text-textMain">Rp ${formatRupiah(b.current)}</p>
                     </div>
                 `;
                 menu.appendChild(createOption(b.id, `Pengeluaran: ${b.name} (-)`, 'expense'));
@@ -504,7 +591,7 @@
                 // Reset custom dropdown
                 document.getElementById('txType').value = '';
                 document.getElementById('txTypeDisplay').textContent = 'Pilih Tujuan Transaksi...';
-                document.getElementById('txTypeDisplay').className = 'text-slate-500 dark:text-slate-400';
+                document.getElementById('txTypeDisplay').className = 'text-textMuted';
                 document.querySelectorAll('#txTypeMenu li[data-value]').forEach(el => el.classList.remove('bg-slate-50', 'dark:bg-slate-800/50', 'font-bold'));
                 fileInput.value = '';
                 updateUI();
@@ -530,8 +617,8 @@
 
                 if(logs.length === 0) {
                     list.innerHTML = `
-                        <div class="text-center p-6 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl">
-                            <p class="text-sm font-medium text-slate-500">Belum ada riwayat transaksi.</p>
+                        <div class="text-center p-6 border-2 border-dashed border-[var(--color-border)] rounded-2xl">
+                            <p class="text-sm font-medium text-textMuted">Belum ada riwayat transaksi.</p>
                         </div>`;
                     return;
                 }
@@ -539,14 +626,14 @@
                 logs.forEach(log => {
                     const color = log.isMinus ? 'text-rose-500' : 'text-emerald-500';
                     const sign = log.isMinus ? '-' : '+';
-                    const imgTag = log.photo ? `<img src="${log.photo}" class="mt-4 w-full max-h-56 object-contain rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">` : '';
+                    const imgTag = log.photo ? `<img src="${log.photo}" class="mt-4 w-full max-h-56 object-contain rounded-xl bg-bgPrime border border-[var(--color-border)] border border-[var(--color-border)]">` : '';
 
                     list.innerHTML += `
-                        <div class="glass p-5 rounded-2xl flex flex-col">
+                        <div class="bento-card p-5 rounded-2xl flex flex-col">
                             <div class="flex justify-between items-start mb-1">
                                 <div class="pr-3">
-                                    <p class="font-bold text-sm text-slate-800 dark:text-slate-100 leading-tight">${log.note}</p>
-                                    <p class="text-xs font-medium text-slate-500 dark:text-slate-400 mt-1">${log.typeLabel} • ${log.timestamp}</p>
+                                    <p class="font-bold text-sm text-textMain leading-tight">${log.note}</p>
+                                    <p class="text-xs font-medium text-textMuted mt-1">${log.typeLabel} • ${log.timestamp}</p>
                                 </div>
                                 <p class="font-extrabold text-sm flex-shrink-0 ${color}">${sign}Rp ${formatRupiah(log.amount)}</p>
                             </div>
@@ -870,7 +957,7 @@
             display.className = 'font-medium truncate ' + (
                 type === 'income' ? 'text-emerald-600 dark:text-emerald-400' : 
                 type === 'expense' ? 'text-rose-600 dark:text-rose-400' : 
-                'text-slate-800 dark:text-slate-100'
+                'text-textMain'
             );
             
             document.querySelectorAll('#txTypeMenu li[data-value]').forEach(el => {
@@ -892,6 +979,311 @@
             const wrapper = document.getElementById('txTypeWrapper');
             if (wrapper && !wrapper.contains(e.target)) toggleCustomSelect(true);
         });
-    </script>
+    
+        // --- 10. NEW THEME ENGINE ---
+        function setTheme(themeName) {
+            document.documentElement.className = themeName;
+            localStorage.setItem('bdzhr_theme', themeName);
+            if(!document.getElementById('view-analitik').classList.contains('hidden')) {
+                renderCharts(); // Re-render charts on theme change
+            }
+        }
+        
+        const savedTheme = localStorage.getItem('bdzhr_theme') || 'theme-dark';
+        setTheme(savedTheme);
+
+        // Remove the old toggleTheme function references
+        window.toggleTheme = function() {
+            const current = document.documentElement.className;
+            if(current === 'theme-dark') setTheme('theme-light');
+            else if(current === 'theme-light') setTheme('theme-pink');
+            else setTheme('theme-dark');
+        };
+
+        
+        // --- 12. WISHLIST / SAVINGS GOAL LOGIC ---
+        function promptNewWishlist() {
+            document.getElementById('wlNameInput').value = '';
+            document.getElementById('wlAmountInput').value = '';
+            const modal = document.getElementById('addWishlistModal');
+            const content = document.getElementById('addWishlistContent');
+            modal.classList.remove('hidden');
+            setTimeout(() => { modal.classList.remove('opacity-0'); content.classList.remove('scale-95'); }, 10);
+        }
+
+        function closeAddWishlistModal() {
+            const modal = document.getElementById('addWishlistModal');
+            const content = document.getElementById('addWishlistContent');
+            modal.classList.add('opacity-0'); content.classList.add('scale-95');
+            setTimeout(() => modal.classList.add('hidden'), 300);
+        }
+
+        function submitNewWishlist() {
+            const name = document.getElementById('wlNameInput').value.trim();
+            const targetAmt = parseRupiah(document.getElementById('wlAmountInput').value);
+            
+            if(!name || targetAmt <= 0) return alert("Nama dan Nominal harus diisi dengan valid!");
+            
+            if(!state.wishlists) state.wishlists = [];
+            state.wishlists.push({ id: 'wl_' + Date.now(), name: name, target: targetAmt, saved: 0 });
+            localStorage.setItem('bdzhrDataProd', JSON.stringify(state));
+            renderWishlists();
+            closeAddWishlistModal();
+        }
+
+        function topupWishlist(wlId) {
+            document.getElementById('topupWlId').value = wlId;
+            document.getElementById('topupAmountInput').value = '';
+            const modal = document.getElementById('topupWishlistModal');
+            const content = document.getElementById('topupWishlistContent');
+            modal.classList.remove('hidden');
+            setTimeout(() => { modal.classList.remove('opacity-0'); content.classList.remove('scale-95'); }, 10);
+        }
+
+        function closeTopupWishlistModal() {
+            const modal = document.getElementById('topupWishlistModal');
+            const content = document.getElementById('topupWishlistContent');
+            modal.classList.add('opacity-0'); content.classList.add('scale-95');
+            setTimeout(() => modal.classList.add('hidden'), 300);
+        }
+
+        function submitTopupWishlist() {
+            const wlId = document.getElementById('topupWlId').value;
+            const amount = parseRupiah(document.getElementById('topupAmountInput').value);
+            if(amount <= 0) return alert("Nominal tidak valid!");
+            
+            if(state.balance < amount) {
+                alert("Saldo Utama tidak mencukupi!");
+                return;
+            }
+
+            const wlIndex = state.wishlists.findIndex(w => w.id === wlId);
+            if(wlIndex > -1) {
+                state.balance -= amount;
+                state.wishlists[wlIndex].saved += amount;
+                
+                const now = new Date();
+                const tx = db.transaction('transactions', 'readwrite');
+                tx.objectStore('transactions').add({
+                    id: Date.now(),
+                    amount: amount,
+                    note: `Nabung Target: ${state.wishlists[wlIndex].name}`,
+                    typeLabel: "Tabungan / Wishlist",
+                    isMinus: true,
+                    timestamp: `${now.getDate().toString().padStart(2, '0')}/${(now.getMonth()+1).toString().padStart(2, '0')}/${now.getFullYear()} ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`,
+                    rawDate: now.toISOString().split('T')[0],
+                    photo: null
+                });
+
+                localStorage.setItem('bdzhrDataProd', JSON.stringify(state));
+                updateUI();
+                renderWishlists();
+                loadLogs();
+                closeTopupWishlistModal();
+            }
+        }
+
+        function deleteWishlist(wlId, wlName) {
+            if(confirm(`Hapus wishlist "${wlName}"? Uang yang terkumpul akan dikembalikan ke Saldo Utama.`)) {
+                const idx = state.wishlists.findIndex(w => w.id === wlId);
+                if(idx > -1) {
+                    state.balance += state.wishlists[idx].saved;
+                    state.wishlists.splice(idx, 1);
+                    localStorage.setItem('bdzhrDataProd', JSON.stringify(state));
+                    updateUI();
+                    renderWishlists();
+                }
+            }
+        }
+
+        function renderWishlists() {
+            const container = document.getElementById('wishlistContainer');
+            if(!container) return;
+            container.innerHTML = '';
+            
+            if(!state.wishlists || state.wishlists.length === 0) {
+                container.innerHTML = `<div class="p-6 text-center text-textMuted border border-dashed border-[var(--color-border)] rounded-2xl"><i class="fa-solid fa-box-open text-3xl mb-3 opacity-50"></i><p class="text-sm font-bold">Belum ada target menabung.</p></div>`;
+                return;
+            }
+
+            state.wishlists.forEach(wl => {
+                let percentage = Math.min(100, Math.round((wl.saved / wl.target) * 100));
+                let isCompleted = percentage >= 100;
+                
+                container.innerHTML += `
+                    <div class="bento-card relative overflow-hidden group">
+                        <button onclick="deleteWishlist('${wl.id}', '${wl.name}')" class="absolute top-4 right-4 text-textMuted hover:text-red-500 text-sm font-bold transition opacity-0 group-hover:opacity-100"><i class="fa-solid fa-trash"></i></button>
+                        <h4 class="text-sm font-bold text-textMain mb-1 pr-6 truncate">${wl.name}</h4>
+                        <div class="flex justify-between items-end mb-3">
+                            <p class="text-[10px] font-bold text-brand uppercase tracking-wider">Terkumpul: Rp ${formatRupiah(wl.saved)}</p>
+                            <p class="text-xs font-bold text-textMuted">Target: Rp ${formatRupiah(wl.target)}</p>
+                        </div>
+                        
+                        <div class="w-full bg-bgPrime rounded-full h-3 mb-4 overflow-hidden border border-[var(--color-border)]">
+                            <div class="h-full bg-gradient-to-r ${isCompleted ? 'from-emerald-400 to-emerald-500' : 'from-brand to-purple-500'} rounded-full transition-all duration-1000" style="width: ${percentage}%"></div>
+                        </div>
+                        
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs font-bold ${isCompleted ? 'text-emerald-500' : 'text-textMain'}">${isCompleted ? '<i class="fa-solid fa-check-circle mr-1"></i> Target Tercapai!' : percentage + '% Tercapai'}</span>
+                            ${!isCompleted ? `<button onclick="topupWishlist('${wl.id}')" class="text-xs font-bold bg-brand/10 text-brand px-4 py-2 rounded-xl hover:bg-brand hover:text-white transition"><i class="fa-solid fa-coins mr-1"></i> Nabung</button>` : `<button class="text-xs font-bold bg-emerald-500/10 text-emerald-600 px-4 py-2 rounded-xl"><i class="fa-solid fa-party-horn mr-1"></i> Selesai</button>`}
+                        </div>
+                    </div>
+                `;
+            });
+        }
+        
+        // Ensure renderWishlists runs on switchTab if wishlist is clicked
+        const originalSwitchTab = switchTab;
+        switchTab = function(tab) {
+            originalSwitchTab(tab);
+            if(tab === 'wishlist') renderWishlists();
+        };
+        
+        // Initial call if already in memory
+        if(state && state.wishlists) {
+            renderWishlists();
+        }
+
+        // --- 11. P2P SYNC VIA PEERJS ---
+        let peer = null;
+        let conn = null;
+
+        function updateSyncStatus(msg, isError=false) {
+            const st = document.getElementById('sync-status');
+            st.innerHTML = msg;
+            st.classList.remove('hidden');
+            if(isError) st.classList.replace('text-brand', 'text-red-500');
+            else st.classList.replace('text-red-500', 'text-brand');
+        }
+
+        function initPeer() {
+            if(peer) return;
+            peer = new Peer();
+            updateSyncStatus('Generating ID... <i class="fa-solid fa-spinner fa-spin"></i>');
+            
+            peer.on('open', (id) => {
+                document.getElementById('my-peer-id').value = id;
+                updateSyncStatus('Ready to receive sync! <i class="fa-solid fa-check"></i>');
+            });
+
+            peer.on('connection', (connection) => {
+                conn = connection;
+                setupConnection(conn, true);
+            });
+            
+            peer.on('error', (err) => {
+                updateSyncStatus('Error: ' + err.type, true);
+            });
+        }
+
+        function connectAndSync() {
+            const targetId = document.getElementById('target-peer-id').value.trim();
+            if(!targetId) return alert('Enter a valid Target ID');
+            if(!peer) {
+                peer = new Peer();
+                peer.on('open', () => {
+                    initiateConnection(targetId);
+                });
+            } else {
+                initiateConnection(targetId);
+            }
+        }
+
+        function initiateConnection(targetId) {
+            updateSyncStatus('Connecting... <i class="fa-solid fa-spinner fa-spin"></i>');
+            conn = peer.connect(targetId);
+            setupConnection(conn, false);
+        }
+
+        function setupConnection(connection, isReceiver) {
+            connection.on('open', () => {
+                updateSyncStatus('Connected! Syncing data... <i class="fa-solid fa-rotate fa-spin"></i>');
+                if(!isReceiver) {
+                    // Sender
+                    const dataToSend = {
+                        state: state,
+                        logs: []
+                    };
+                    const tx = db.transaction('transactions', 'readonly');
+                    const req = tx.objectStore('transactions').getAll();
+                    req.onsuccess = () => {
+                        dataToSend.logs = req.result;
+                        connection.send(dataToSend);
+                        updateSyncStatus('Data Sent Successfully! <i class="fa-solid fa-check-double"></i>');
+                    };
+                }
+            });
+
+            connection.on('data', (data) => {
+                if(isReceiver && data.state) {
+                    // Overwrite DB
+                    localStorage.setItem('bdzhrDataProd', JSON.stringify(data.state));
+                    state = data.state;
+                    
+                    const tx = db.transaction('transactions', 'readwrite');
+                    const store = tx.objectStore('transactions');
+                    store.clear().onsuccess = () => {
+                        let count = 0;
+                        if(data.logs.length === 0) {
+                            updateUI(); loadLogs();
+                            updateSyncStatus('Data Received and Applied! <i class="fa-solid fa-check-double"></i>');
+                        }
+                        data.logs.forEach(log => {
+                            store.add(log).onsuccess = () => {
+                                count++;
+                                if(count === data.logs.length) {
+                                    updateUI(); loadLogs();
+                                    updateSyncStatus('Data Received and Applied! <i class="fa-solid fa-check-double"></i>');
+                                }
+                            };
+                        });
+                    };
+                }
+            });
+        }
+
+</script>
+
+    <!-- CUSTOM MODALS -->
+    <!-- Add Wishlist Modal -->
+    <div id="addWishlistModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex-col justify-center items-center transition-opacity opacity-0">
+        <div class="bento-card relative w-full max-w-[320px] mx-4 transform scale-95 transition-transform duration-300" id="addWishlistContent">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-black text-textMain tracking-tight">Target Baru</h2>
+                <button onclick="closeAddWishlistModal()" class="text-textMuted hover:text-brand transition"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-textMuted mb-1.5">Nama Target / Barang</label>
+                    <input type="text" id="wlNameInput" class="w-full bg-bgPrime border border-[var(--color-border)] rounded-xl p-3.5 text-textMain font-medium focus:outline-none focus:ring-2 focus:ring-brand" placeholder="Misal: iPhone 15">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-textMuted mb-1.5">Dana yang Dibutuhkan (Rp)</label>
+                    <input type="text" inputmode="numeric" id="wlAmountInput" onkeyup="formatInput(this)" class="w-full bg-bgPrime border border-[var(--color-border)] rounded-xl p-3.5 text-textMain font-bold focus:outline-none focus:ring-2 focus:ring-brand" placeholder="Misal: 15.000.000">
+                </div>
+                <button onclick="submitNewWishlist()" class="w-full py-3.5 bg-brand text-white rounded-xl font-bold shadow-[0_4px_12px_var(--color-brand-glow)] hover:opacity-90 transition-all mt-2">Buat Target</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Topup Wishlist Modal -->
+    <div id="topupWishlistModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex-col justify-center items-center transition-opacity opacity-0">
+        <div class="bento-card relative w-full max-w-[320px] mx-4 transform scale-95 transition-transform duration-300" id="topupWishlistContent">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-black text-textMain tracking-tight"><i class="fa-solid fa-coins text-brand mr-2"></i> Isi Celengan</h2>
+                <button onclick="closeTopupWishlistModal()" class="text-textMuted hover:text-brand transition"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            <div class="space-y-4">
+                <p class="text-xs text-textMuted font-medium mb-2">Dana akan diambil dari Saldo Utama.</p>
+                <input type="hidden" id="topupWlId">
+                <div>
+                    <label class="block text-xs font-bold text-textMuted mb-1.5">Nominal yang ditabung (Rp)</label>
+                    <input type="text" inputmode="numeric" id="topupAmountInput" onkeyup="formatInput(this)" class="w-full bg-bgPrime border border-[var(--color-border)] rounded-xl p-3.5 text-textMain font-bold focus:outline-none focus:ring-2 focus:ring-brand text-center text-lg" placeholder="0">
+                </div>
+                <button onclick="submitTopupWishlist()" class="w-full py-3.5 bg-gradient-to-r from-emerald-400 to-emerald-500 text-white rounded-xl font-bold shadow-lg hover:opacity-90 transition-all mt-2">Tabung Sekarang!</button>
+            </div>
+        </div>
+    </div>
+
 </body>
 </html>
