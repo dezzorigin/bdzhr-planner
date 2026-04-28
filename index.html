@@ -363,7 +363,7 @@
             const modal = document.getElementById('settingsModal');
             const content = document.getElementById('settingsContent');
             if(modal.classList.contains('hidden')) {
-                modal.classList.remove('hidden');
+                modal.classList.replace('hidden', 'flex');
                 setTimeout(() => {
                     modal.classList.remove('opacity-0');
                     content.classList.remove('translate-y-full');
@@ -371,7 +371,7 @@
             } else {
                 modal.classList.add('opacity-0');
                 content.classList.add('translate-y-full');
-                setTimeout(() => modal.classList.add('hidden'), 300);
+                setTimeout(() => modal.classList.replace('flex', 'hidden'), 300);
             }
         }
 
@@ -1007,7 +1007,7 @@
             document.getElementById('wlAmountInput').value = '';
             const modal = document.getElementById('addWishlistModal');
             const content = document.getElementById('addWishlistContent');
-            modal.classList.remove('hidden');
+            modal.classList.replace('hidden', 'flex');
             setTimeout(() => { modal.classList.remove('opacity-0'); content.classList.remove('scale-95'); }, 10);
         }
 
@@ -1015,7 +1015,7 @@
             const modal = document.getElementById('addWishlistModal');
             const content = document.getElementById('addWishlistContent');
             modal.classList.add('opacity-0'); content.classList.add('scale-95');
-            setTimeout(() => modal.classList.add('hidden'), 300);
+            setTimeout(() => modal.classList.replace('flex', 'hidden'), 300);
         }
 
         function submitNewWishlist() {
@@ -1036,7 +1036,7 @@
             document.getElementById('topupAmountInput').value = '';
             const modal = document.getElementById('topupWishlistModal');
             const content = document.getElementById('topupWishlistContent');
-            modal.classList.remove('hidden');
+            modal.classList.replace('hidden', 'flex');
             setTimeout(() => { modal.classList.remove('opacity-0'); content.classList.remove('scale-95'); }, 10);
         }
 
@@ -1044,7 +1044,7 @@
             const modal = document.getElementById('topupWishlistModal');
             const content = document.getElementById('topupWishlistContent');
             modal.classList.add('opacity-0'); content.classList.add('scale-95');
-            setTimeout(() => modal.classList.add('hidden'), 300);
+            setTimeout(() => modal.classList.replace('flex', 'hidden'), 300);
         }
 
         function submitTopupWishlist() {
