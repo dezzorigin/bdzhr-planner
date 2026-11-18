@@ -32,7 +32,7 @@
   <rect class="accent" x="56" y="108" width="34" height="34" rx="9"/>
   <text x="73" y="131" fill="#fff" font-size="16" font-weight="800" text-anchor="middle" font-family="Inter, system-ui, sans-serif">1</text>
   <text x="100" y="122" class="ink mid">Landing</text>
-  <text x="100" y="140" class="mut small">hero + fitur + CTA</text>
+  <text x="100" y="140" class="mut small">hero + preview + fitur + CTA</text>
   <text x="56" y="164" class="mut small">Pengguna baru mulai di sini</text>
   <text x="56" y="164" class="mut small" opacity="0">.</text>
 </g>
