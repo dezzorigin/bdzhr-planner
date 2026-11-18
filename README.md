@@ -12,15 +12,19 @@ Perencana keuangan pribadi — atur saldo awal dan anggaran per kategori, catat 
 |---|---|---|
 | ![Landing Bdzhr Planner](docs/screenshots/1-landing.png) | ![Dashboard Bdzhr Planner](docs/screenshots/3-dashboard.png) | ![Analitik Bdzhr Planner](docs/screenshots/4-analitik.png) |
 
+Di ponsel (390px):
+
+![Landing Bdzhr Planner di ponsel](docs/screenshots/8-landing-mobile.png)
+
 ## Demo video
 
 [![Demo satu alur Bdzhr Planner — landing, setup, transaksi, analitik](docs/screenshots/1-landing.png)](docs/demo/demo.mp4)
 
-> Klik gambar di atas untuk memutar video demo (9 detik, tanpa suara — direkam headless, tanpa audio). GitHub tidak menampilkan tag `<video>` di README, jadi demo disajikan sebagai tautan.
+> Klik gambar di atas untuk memutar video demo (9,6 detik, tanpa suara — direkam headless, tanpa audio). GitHub tidak menampilkan tag `<video>` di README, jadi demo disajikan sebagai tautan.
 
 ## Fitur
 
-- **Landing page** — halaman depan yang menjelaskan apa itu Bdzhr Planner (hero, fitur, cara kerja) sebelum masuk ke setup; tampil pertama kali bagi pengguna baru.
+- **Landing page** — halaman depan gaya SaaS (navbar sticky + tautan GitHub ke repo ini, hero dua kolom dengan pratinjau produk, grid fitur, cara kerja 3 langkah, CTA band, footer) sebelum masuk ke setup; tampil pertama kali bagi pengguna baru.
 - **Setup awal** — isi saldo awal, lalu alokasi anggaran per kategori (bawaan: Kebutuhan Pokok, Transportasi; bisa tambah/hapus).
 - **Dashboard** — total saldo saat ini, ringkasan bulan ini (masuk/keluar/jumlah transaksi), dan sisa tiap kategori anggaran. Tambah kategori langsung dari form inline di dashboard.
 - **Transaksi** — pemasukan, pengeluaran tak terduga, atau pengeluaran per kategori, lengkap dengan keterangan dan foto bukti (opsional, tersimpan sebagai base64 di perangkat).

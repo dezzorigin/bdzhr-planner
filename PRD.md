@@ -34,7 +34,7 @@ Perencana keuangan pribadi untuk satu pengguna yang butuh cara cepat mencatat ua
 
 ### In Scope (sudah ada, terverifikasi jalan)
 
-- Landing page: hero + fitur + cara kerja + CTA ke setup; tampil pertama kali bagi pengguna baru.
+- Landing page gaya SaaS: navbar sticky (tautan GitHub ke repo ini), hero dua kolom + pratinjau produk, grid 6 fitur, cara kerja 3 langkah, CTA band, footer; CTA ke setup; tampil pertama kali bagi pengguna baru.
 - Ringkasan bulan ini di dashboard (total masuk, total keluar, jumlah transaksi).
 - Tambah kategori anggaran lewat form inline di dashboard (menggantikan dialog `prompt()`).
 - Setup awal: saldo awal + kategori anggaran (tambah/hapus, peringatan bila total anggaran melebihi saldo).
@@ -58,7 +58,7 @@ Perencana keuangan pribadi untuk satu pengguna yang butuh cara cepat mencatat ua
 
 | # | Fitur | Perilaku yang diverifikasi |
 |---|---|---|
-| 0 | Landing page | Hero, kartu fitur, cara kerja 3 langkah, dan CTA "Mulai Atur Uang" menuju setup; pengguna lama langsung masuk dashboard |
+| 0 | Landing page | Navbar sticky + ikon GitHub, hero dua kolom + pratinjau produk, grid 6 fitur, cara kerja 3 langkah, CTA band, footer; CTA "Mulai Atur Uang" menuju setup; pengguna lama langsung masuk dashboard |
 | 1 | Setup awal | Saldo awal wajib > 0; dua kategori bawaan (Kebutuhan Pokok, Transportasi); peringatan bila total anggaran > saldo |
 | 2 | Dashboard | Saldo tampil `Rp` format Indonesia; kartu tiap kategori menampilkan sisa anggarannya; ringkasan bulan ini (masuk/keluar/jumlah) dihitung dari riwayat; tambah kategori via form inline |
 | 3 | Tambah transaksi | Nominal wajib > 0 dan jenis wajib dipilih; pengeluaran mengurangi saldo + sisa kategori; pemasukan menambah saldo |
@@ -76,7 +76,7 @@ Perencana keuangan pribadi untuk satu pengguna yang butuh cara cepat mencatat ua
 
 - **Offline-first:** setelah satu kunjungan online, halaman + library CDN + font sudah di-cache dan aplikasi terbuka tanpa internet.
 - **Privasi:** tidak ada pelacakan, tidak ada akun, tidak ada data yang dikirim ke server mana pun kecuali saat pengguna sendiri memakai sync P2P (data langsung antar perangkat; pensinyalan memakai broker publik PeerJS).
-- **Performa:** satu file HTML ±72 KB + CDN; tanpa build; muat cepat di jaringan normal.
+- **Performa:** satu file HTML ±90 KB + CDN; tanpa build; muat cepat di jaringan normal.
 - **Maintainability:** satu file `index.html` (markup + CSS + JS) — disengaja, supaya mudah dibaca dan diedit tanpa toolchain.
 - **Portabilitas:** jalan di browser modern (Chrome/Edge/Firefox/Safari); PWA install paling lengkap di Chrome/Edge Android & desktop.
 

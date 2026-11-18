@@ -3,7 +3,7 @@
 ## Ringkasan
 
 Bdzhr Planner adalah PWA statis satu halaman, tanpa build step dan tanpa
-backend. Seluruh aplikasi tinggal di `index.html` (±72 KB: markup + CSS +
+backend. Seluruh aplikasi tinggal di `index.html` (±90 KB: markup + CSS +
 JavaScript), dengan `manifest.json` dan `sw.js` sebagai lapisan PWA.
 Live di https://planku.pages.dev (Cloudflare Pages, deploy dari branch
 `main`).
@@ -26,7 +26,7 @@ Live di https://planku.pages.dev (Cloudflare Pages, deploy dari branch
 
 ```
 Kunjungan pertama (online)
-  → landingView: hero + fitur + cara kerja → tombol "Mulai Atur Uang"
+  → landingView (gaya SaaS): navbar + hero + preview produk + fitur + cara kerja + CTA band + footer → tombol "Mulai Atur Uang"
   → setupView: isi saldo awal + alokasi tiap kategori → Simpan Konfigurasi
   → state disimpan di localStorage (bdzhrDataProd)
   → mainSpaView: 4 tab lewat bottom nav
@@ -39,10 +39,34 @@ Kunjungan pertama (online)
 
 ## Landing & onboarding
 
-Pengguna baru pertama kali melihat `landingView` (hero, kartu fitur,
-cara kerja 3 langkah, CTA) — bukan langsung form setup. `startSetup()`
-membuka `setupView`; pengguna lama (state sudah ada di `localStorage`)
-langsung masuk `mainSpaView`. Setup menampilkan ringkasan alokasi live
+Pengguna baru pertama kali melihat `landingView` — halaman depan gaya
+SaaS, bukan langsung form setup:
+
+- **Navbar sticky** (`<header>`): logo Bdzhr Planner di kiri, tautan
+  Fitur (`#fitur`) dan Cara Kerja (`#howItWorks`) di tengah, lalu di
+  kanan ikon logo GitHub resmi (SVG mark, `aria-label="Lihat di
+  GitHub"`) yang mengarah ke https://github.com/dezzorigin/bdzhr-planner
+  (tab baru) + tombol CTA "Mulai Atur Uang". Navbar hanya tampil di
+  landing: `showLanding()` menampilkannya, `startSetup()` dan
+  `checkSetup()` (saat state sudah ada) menyembunyikannya lewat
+  `#landingNavWrap`. Repo ini publik, jadi tautan GitHub memang boleh
+  diklik siapa saja.
+- **Hero dua kolom** (desktop; menumpuk di ponsel): kiri badge, headline
+  "Uangmu, rapi tanpa ribet." + subcopy yang sama seperti sebelumnya, 2
+  CTA (primer "Mulai Atur Uang →" ke setup, sekunder "Lihat cara kerja"
+  anchor ke `#howItWorks`); kanan kartu "Contoh tampilan" yang sudah ada
+  dirapikan jadi pratinjau produk (chrome bar browser + pill
+  `planku.pages.dev`, ringkasan bulan ini, keterangan "data contoh").
+- **Section bawah**: grid 6 fitur (konten sama), cara kerja 3 langkah,
+  catatan privasi (offline, tanpa akun, tanpa server), CTA band, footer
+  sederhana (tautan GitHub + live).
+- Landing keluar dari container `max-w-md` milik `<main>` lewat CSS
+  `#landingView { width: 100vw; margin-left: calc(50% - 50vw); }`
+  (dengan `overflow-x: clip` di `html, body` supaya tidak ada scroll
+  horizontal). Setup dan dashboard tidak berubah — tetap `max-w-md`.
+
+`startSetup()` membuka `setupView`; pengguna lama (state sudah ada di
+`localStorage`) langsung masuk `mainSpaView`. Setup menampilkan ringkasan alokasi live
 ("Dialokasikan Rp X dari Rp Y · Sisa Rp Z") dan peringatan bila total
 anggaran melebihi saldo. Semua validasi form memakai pesan inline di
 halaman (bukan `alert()`); konfirmasi penghapusan data tetap memakai
