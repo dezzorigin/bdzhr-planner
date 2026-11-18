@@ -1,16 +1,1 @@
-{
-  "name": "Bdzhr Planner",
-  "short_name": "Bdzhr",
-  "start_url": "./index.html",
-  "display": "standalone",
-  "background_color": "#0f172a",
-  "theme_color": "#6366f1",
-  "icons": [
-    {
-      "src": "https://cdn-icons-png.flaticon.com/512/3135/3135715.png", 
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
-    }
-  ]
-}
+{"background_color":"#0f172a","description":"Perencana keuangan pribadi: anggaran, transaksi, target menabung, dan analitik. PWA offline, data tersimpan di perangkat.","display":"standalone","icons":[{"purpose":"any","sizes":"192x192","src":"icon-192.png","type":"image/png"},{"purpose":"maskable","sizes":"512x512","src":"icon-512.png","type":"image/png"}],"id":"./","name":"Bdzhr Planner","orientation":"portrait","scope":"./","short_name":"Bdzhr","start_url":"./","theme_color":"#6366f1"}
