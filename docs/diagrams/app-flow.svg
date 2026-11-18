@@ -1,0 +1,122 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="880" height="560" viewBox="0 0 880 560" role="img" aria-labelledby="t d">
+<title id="t">Alur aplikasi Bdzhr Planner</title>
+<desc id="d">Pengguna membuka PWA: setup awal sekali, lalu empat tab utama (Utama, Analitik, Target, Riwayat) ditambah Pengaturan. Data tersimpan lokal di localStorage dan IndexedDB; service worker men-cache semuanya untuk mode offline; sinkronisasi antar perangkat memakai PeerJS.</desc>
+<style>
+  .bg { fill: #f8fafc; }
+  .card { fill: #ffffff; stroke: #e2e8f0; stroke-width: 1.5; rx: 16; }
+  .card-ink { fill: #0f172a; }
+  .card-mut { fill: #64748b; }
+  .accent { fill: #6366f1; }
+  .accent-soft { fill: #eef2ff; stroke: #c7d2fe; stroke-width: 1.5; }
+  .ink { fill: #0f172a; font-family: Inter, system-ui, sans-serif; }
+  .mut { fill: #64748b; font-family: Inter, system-ui, sans-serif; }
+  .small { font-size: 12px; }
+  .mid { font-size: 13px; font-weight: 600; }
+  .big { font-size: 15px; font-weight: 800; }
+  .arrow { stroke: #6366f1; stroke-width: 2; fill: none; marker-end: url(#ah); }
+  .arrow-ghost { stroke: #94a3b8; stroke-width: 1.5; fill: none; stroke-dasharray: 5 4; marker-end: url(#ag); }
+</style>
+<defs>
+  <marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#6366f1"/></marker>
+  <marker id="ag" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#94a3b8"/></marker>
+</defs>
+
+<rect class="bg" width="880" height="560" rx="8"/>
+
+<text x="40" y="44" class="ink" font-size="20" font-weight="800">Bdzhr Planner — alur aplikasi</text>
+<text x="40" y="66" class="mut small">Satu halaman, tanpa server. Data tinggal di perangkat; online hanya untuk kunjungan pertama dan sync P2P.</text>
+
+<!-- Step 1: open -->
+<g>
+  <rect class="card" x="40" y="92" width="180" height="86"/>
+  <rect class="accent" x="56" y="108" width="34" height="34" rx="9"/>
+  <text x="73" y="131" fill="#fff" font-size="16" font-weight="800" text-anchor="middle" font-family="Inter, system-ui, sans-serif">1</text>
+  <text x="100" y="122" class="ink mid">Landing</text>
+  <text x="100" y="140" class="mut small">hero + fitur + CTA</text>
+  <text x="56" y="164" class="mut small">Pengguna baru mulai di sini</text>
+  <text x="56" y="164" class="mut small" opacity="0">.</text>
+</g>
+
+<!-- Step 2: setup -->
+<g>
+  <rect class="card" x="252" y="92" width="200" height="86"/>
+  <rect class="accent" x="268" y="108" width="34" height="34" rx="9"/>
+  <text x="285" y="131" fill="#fff" font-size="16" font-weight="800" text-anchor="middle" font-family="Inter, system-ui, sans-serif">2</text>
+  <text x="312" y="122" class="ink mid">Setup awal (sekali)</text>
+  <text x="312" y="140" class="mut small">saldo + kategori anggaran</text>
+  <text x="268" y="164" class="mut small">→ tersimpan di localStorage</text>
+</g>
+
+<!-- Step 3: four tabs -->
+<g>
+  <rect class="card" x="484" y="92" width="356" height="86"/>
+  <rect class="accent" x="500" y="108" width="34" height="34" rx="9"/>
+  <text x="517" y="131" fill="#fff" font-size="16" font-weight="800" text-anchor="middle" font-family="Inter, system-ui, sans-serif">3</text>
+  <text x="544" y="122" class="ink mid">Empat tab utama</text>
+  <text x="544" y="140" class="mut small">Utama · Analitik · Target · Riwayat</text>
+  <text x="500" y="164" class="mut small">+ Pengaturan (tema, sync, reset)</text>
+</g>
+
+<path class="arrow" d="M220 135 H 246"/>
+<path class="arrow" d="M452 135 H 478"/>
+
+<!-- Tabs detail row -->
+<g>
+  <rect class="accent-soft" x="40" y="212" width="190" height="96" rx="14"/>
+  <text x="56" y="240" class="ink big">Utama</text>
+  <text x="56" y="260" class="mut small">Saldo + sisa tiap kategori</text>
+  <text x="56" y="278" class="mut small">Form transaksi (nominal,</text>
+  <text x="56" y="294" class="mut small">keterangan, foto bukti)</text>
+</g>
+<g>
+  <rect class="accent-soft" x="250" y="212" width="190" height="96" rx="14"/>
+  <text x="266" y="240" class="ink big">Analitik</text>
+  <text x="266" y="260" class="mut small">Donat pengeluaran</text>
+  <text x="266" y="278" class="mut small">per kategori (Chart.js)</text>
+  <text x="266" y="294" class="mut small">Batang arus kas 7 hari</text>
+</g>
+<g>
+  <rect class="accent-soft" x="460" y="212" width="190" height="96" rx="14"/>
+  <text x="476" y="240" class="ink big">Target</text>
+  <text x="476" y="260" class="mut small">Wishlist: buat target,</text>
+  <text x="476" y="278" class="mut small">nabung bertahap,</text>
+  <text x="476" y="294" class="mut small">progres sampai 100%</text>
+</g>
+<g>
+  <rect class="accent-soft" x="670" y="212" width="170" height="96" rx="14"/>
+  <text x="686" y="240" class="ink big">Riwayat</text>
+  <text x="686" y="260" class="mut small">Filter tanggal</text>
+  <text x="686" y="278" class="mut small">Ekspor PDF / CSV</text>
+  <text x="686" y="294" class="mut small">(offline)</text>
+</g>
+
+<path class="arrow" d="M575 178 V 206"/>
+<path class="arrow" d="M135 178 V 206"/>
+<path class="arrow" d="M345 178 V 206"/>
+<path class="arrow" d="M755 178 V 206"/>
+
+<!-- Storage row -->
+<g>
+  <rect class="card" x="40" y="344" width="400" height="86"/>
+  <text x="56" y="372" class="ink mid">Penyimpanan lokal — tanpa server</text>
+  <text x="56" y="392" class="mut small">localStorage `bdzhrDataProd` — saldo, kategori, wishlist</text>
+  <text x="56" y="410" class="mut small">IndexedDB `BdzhrPlannerDB` — riwayat transaksi (+ foto)</text>
+</g>
+<g>
+  <rect class="card" x="460" y="344" width="380" height="86"/>
+  <text x="476" y="372" class="ink mid">Offline — service worker v2</text>
+  <text x="476" y="392" class="mut small">Precache halaman + ikon + library CDN</text>
+  <text x="476" y="410" class="mut small">Runtime cache untuk font Google</text>
+</g>
+
+<path class="arrow" d="M240 308 V 338"/>
+<path class="arrow" d="M650 308 V 338"/>
+
+<!-- Sync row -->
+<g>
+  <rect class="card" x="40" y="464" width="800" height="62"/>
+  <text x="56" y="492" class="ink mid">Sync P2P (opsional, manual) — PeerJS / WebRTC</text>
+  <text x="56" y="512" class="mut small">Perangkat A membuat ID → perangkat B menghubungkan ID itu → seluruh data terkirim langsung antar perangkat (broker PeerJS hanya untuk pensinyalan).</text>
+</g>
+<path class="arrow-ghost" d="M650 430 V 458"/>
+</svg>
