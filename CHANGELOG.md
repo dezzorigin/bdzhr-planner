@@ -5,6 +5,13 @@ Semua perubahan penting pada proyek ini didokumentasikan di sini.
 Format mengikuti [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 dan proyek ini mengikuti [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- Meta Open Graph + Twitter Card di `index.html` (og:title/description/type/url/image, twitter:card `summary_large_image`) agar tautan https://planku.pages.dev tampil sebagai kartu preview saat dibagikan di WhatsApp/Telegram.
+- `og-image.png` (1200x630) — screenshot asli halaman landing situs ini.
+
 ## [1.2.0] - 2026-11-18
 
 Redesign landing page jadi gaya SaaS (permintaan pemilik repo).
